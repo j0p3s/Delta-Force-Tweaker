@@ -1,0 +1,35 @@
+# Publishes a GitHub release when a version tag (v1.2.3 or v1.2.3-beta) is pushed.
+# Release notes come from .github/release-notes/<tag>.md; tags with a "-" suffix
+# (for example v1.0.0-beta) are marked as pre-releases.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          SCRIPT="Delta-Force-Tweaker_v${VERSION}.cmd"
+          NOTES=".github/release-notes/${TAG}.md"
+          test -f "$SCRIPT" || { echo "Missing $SCRIPT"; exit 1; }
+          test -f "$NOTES" || { echo "Missing $NOTES"; exit 1; }
+          sha256sum "$SCRIPT" > "${SCRIPT}.sha256"
+          PRE=""
+          case "$TAG" in *-*) PRE="--prerelease" ;; esac
+          gh release create "$TAG" "$SCRIPT" "${SCRIPT}.sha256" \
+            --title "Delta Force Tweaker ${TAG}" \
+            --notes-file "$NOTES" $PRE
