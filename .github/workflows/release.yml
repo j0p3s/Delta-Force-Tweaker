@@ -1,12 +1,21 @@
-# Publishes a GitHub release when a version tag (v1.2.3 or v1.2.3-beta) is pushed.
-# Release notes come from .github/release-notes/<tag>.md; tags with a "-" suffix
-# (for example v1.0.0-beta) are marked as pre-releases.
+# Publishes a GitHub release for the script version found on main.
+#
+# How to release a new version:
+#   1. Rename the script to Delta-Force-Tweaker_v<version>.cmd and update its VERSION line
+#   2. Add .github/release-notes/v<version>.md
+#   3. Push to main - this workflow creates the tag and the release
+# Versions with a suffix (for example 1.0.0-beta) are published as pre-releases.
+# If the release already exists, nothing happens. It can also be started by hand
+# from the Actions tab (Run workflow).
 name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
+    paths:
+      - '.github/release-notes/**'
+      - 'Delta-Force-Tweaker_v*.cmd'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,19 +26,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create release
+      - name: Create release if missing
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
         run: |
-          VERSION="${TAG#v}"
-          SCRIPT="Delta-Force-Tweaker_v${VERSION}.cmd"
+          SCRIPT=$(ls Delta-Force-Tweaker_v*.cmd | sort -V | tail -n 1)
+          VERSION=$(grep -m1 -oP 'set "VERSION=\K[^"]+' "$SCRIPT")
+          TAG="v${VERSION}"
           NOTES=".github/release-notes/${TAG}.md"
-          test -f "$SCRIPT" || { echo "Missing $SCRIPT"; exit 1; }
+          echo "Script: $SCRIPT  Version: $VERSION"
+          if [ "$SCRIPT" != "Delta-Force-Tweaker_v${VERSION}.cmd" ]; then
+            echo "File name and VERSION line do not match"; exit 1
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists - nothing to do"; exit 0
+          fi
           test -f "$NOTES" || { echo "Missing $NOTES"; exit 1; }
           sha256sum "$SCRIPT" > "${SCRIPT}.sha256"
           PRE=""
-          case "$TAG" in *-*) PRE="--prerelease" ;; esac
+          case "$VERSION" in *-*) PRE="--prerelease" ;; esac
           gh release create "$TAG" "$SCRIPT" "${SCRIPT}.sha256" \
+            --target "$GITHUB_SHA" \
             --title "Delta Force Tweaker ${TAG}" \
             --notes-file "$NOTES" $PRE
