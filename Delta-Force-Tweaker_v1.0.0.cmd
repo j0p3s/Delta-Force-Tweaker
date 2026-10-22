@@ -581,7 +581,7 @@ function Get-Npi {
 # Game executables (scans the install folder; falls back to the known names)
 function Get-GameExes {
     # names NVIDIA's official profile (driver 621.01) assigns to the game
-    $list = @('DeltaForceClient-Win64-Shipping.exe', 'DeltaForce-Win64-Shipping.exe', 'DeltaForce.exe')
+    $list = @('DeltaForceClient-Win64-Shipping.exe', 'DeltaForce-Win64-Shipping.exe', 'DeltaForce.exe', 'BHDClient-Win64-Shipping.exe')
     $paths = @()
     foreach ($g in Get-GameDirs) {
         foreach ($f in Get-ChildItem -LiteralPath $g -Recurse -Filter '*-Win64-Shipping.exe') { $list += $f.Name; $paths += $f.FullName }

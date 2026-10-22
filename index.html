@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delta Force Tweaker</title>
+<meta name="description" content="Pick your hardware and get tuned Delta Force graphics settings, a ready-to-use UserSystemSettingHD.ini and an NVIDIA Profile Inspector profile. Runs 100% in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 4 6 58h52z' fill='none' stroke='%2322c55e' stroke-width='6' stroke-linejoin='round'/%3E%3Cpath d='M32 24 20 50h24z' fill='%2322c55e'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f4f6f5;--surface:#ffffff;--surface2:#eef2f0;--text:#14201a;--muted:#5b6b62;--border:#d5ddd8;
+  --accent:#118a43;--accent-text:#ffffff;--warn-bg:#fff6e0;--warn-border:#e7b54a;--warn-text:#5c4100;
+  --ok:#118a43;--add:#1d6fd1;--danger:#b42318;--code:#e7ece9;
+  --radius:12px;--shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1210;--surface:#141b17;--surface2:#1a231e;--text:#e3ebe6;--muted:#93a39a;--border:#26332c;
+    --accent:#22c55e;--accent-text:#04110a;--warn-bg:#2a2210;--warn-border:#7a5c16;--warn-text:#f2d9a0;
+    --ok:#22c55e;--add:#5aa2f5;--danger:#f97066;--code:#1f2a24;--shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1210;--surface:#141b17;--surface2:#1a231e;--text:#e3ebe6;--muted:#93a39a;--border:#26332c;
+  --accent:#22c55e;--accent-text:#04110a;--warn-bg:#2a2210;--warn-border:#7a5c16;--warn-text:#f2d9a0;
+  --ok:#22c55e;--add:#5aa2f5;--danger:#f97066;--code:#1f2a24;--shadow:none;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif}
+a{color:var(--accent)}
+code,kbd{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88em;background:var(--code);padding:.1em .35em;border-radius:5px;word-break:break-all}
+kbd{border:1px solid var(--border)}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--border);background:var(--surface)}
+.top{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:14px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem}
+.brand svg{width:28px;height:28px}
+.ver{font-size:.75rem;font-weight:600;color:var(--muted);border:1px solid var(--border);border-radius:99px;padding:1px 8px}
+.tools{display:flex;gap:8px;align-items:center}
+select,input[type=file]{font:inherit;color:var(--text)}
+select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;width:100%;min-height:42px}
+.tools select{width:auto;min-height:36px;padding:6px 8px}
+.hero{padding:28px 0 8px}
+.hero h1{margin:0 0 6px;font-size:clamp(1.5rem,4vw,2.1rem);line-height:1.2}
+.hero p{margin:0;color:var(--muted);max-width:720px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.badge{font-size:.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:3px 10px;color:var(--muted)}
+section.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin:18px 0}
+.card h2{margin:0 0 4px;font-size:1.2rem;display:flex;align-items:center;gap:10px}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-text);font-size:.9rem;flex:none}
+.sub{color:var(--muted);margin:0 0 16px;font-size:.95rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:.9rem;font-weight:600}
+.btn{font:inherit;font-weight:600;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:10px;padding:10px 16px;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 0}
+.note{font-size:.88rem;color:var(--muted)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.seg label{border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;background:var(--surface)}
+.seg input{margin-top:4px;accent-color:var(--accent)}
+.seg label:has(input:checked){border-color:var(--accent);background:var(--surface2)}
+.seg b{display:block}
+.seg span{font-size:.85rem;color:var(--muted)}
+.tier{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.tier strong{color:var(--accent);font-size:1.1rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.93rem}
+.tbl th,.tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl th{font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+.tbl td:last-child{font-weight:600}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text);border-radius:10px;padding:12px 14px;font-size:.92rem}
+.warn b{display:block;margin-bottom:4px}
+ol.steps{padding-left:1.3em;margin:12px 0}
+ol.steps li{margin:6px 0}
+.drop{display:block;border:2px dashed var(--border);border-radius:12px;padding:22px;text-align:center;background:var(--surface2);cursor:pointer}
+.drop.over{border-color:var(--accent)}
+.drop input{display:none}
+.status{margin-top:10px;font-weight:600}
+.status.ok{color:var(--ok)}.status.err{color:var(--danger)}
+.tag{font-size:.75rem;font-weight:700;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.tag.chg{background:var(--accent);color:var(--accent-text)}
+.tag.add{background:var(--add);color:#fff}
+.tag.same{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.muted{color:var(--muted)}
+.hidden{display:none!important}
+ul.tips{margin:8px 0 0;padding-left:1.2em}
+ul.tips li{margin:6px 0}
+footer{color:var(--muted);font-size:.85rem;padding:24px 0 40px;border-top:1px solid var(--border);margin-top:28px}
+footer p{margin:6px 0}
+@media (max-width:560px){
+  .seg{grid-template-columns:1fr}
+  section.card{padding:16px}
+  .tbl th:nth-child(3),.tbl td:nth-child(3){display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 6 58h52z" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="round" style="color:var(--accent)"/><path d="M32 24 20 50h24z" fill="currentColor" style="color:var(--accent)"/></svg>
+      <span>Delta Force Tweaker</span><span class="ver" id="ver"></span>
+    </div>
+    <div class="tools">
+      <select id="lang" aria-label="Language"></select>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1 data-i="heroTitle"></h1>
+    <p data-i="heroText"></p>
+    <div class="badges"><span class="badge" data-i="badge1"></span><span class="badge" data-i="badge2"></span><span class="badge" data-i="badge3"></span></div>
+  </div>
+
+  <!-- 1. Hardware -->
+  <section class="card" id="s1">
+    <h2><span class="num">1</span><span data-i="s1Title"></span></h2>
+    <p class="sub" data-i="s1Sub"></p>
+    <div class="grid">
+      <label class="f"><span data-i="gpuVendor"></span><select id="vendor"></select></label>
+      <label class="f"><span data-i="gpuSeries"></span><select id="series"></select></label>
+      <label class="f"><span data-i="vram"></span><select id="vram"></select></label>
+      <label class="f"><span data-i="ram"></span><select id="ram"></select></label>
+      <label class="f"><span data-i="threads"></span><select id="threads"></select></label>
+      <label class="f"><span data-i="resolution"></span><select id="res"></select></label>
+      <label class="f"><span data-i="refresh"></span><select id="hz"></select></label>
+    </div>
+    <div class="row">
+      <button class="btn" id="detect" type="button"><span data-i="detectBtn"></span></button>
+      <span class="note" id="detectMsg" data-i="detectNote"></span>
+    </div>
+    <div class="seg" role="radiogroup">
+      <label><input type="radio" name="profile" value="Balanced" checked><div><b data-i="profBalanced"></b><span data-i="profBalancedDesc"></span></div></label>
+      <label><input type="radio" name="profile" value="Competitive"><div><b data-i="profCompetitive"></b><span data-i="profCompetitiveDesc"></span></div></label>
+    </div>
+    <div class="tier"><span data-i="tierLabel"></span> <strong id="tierName"></strong> <span class="muted" id="tierReason"></span></div>
+  </section>
+
+  <!-- 2. Recommended settings -->
+  <section class="card" id="s2">
+    <h2><span class="num">2</span><span data-i="s2Title"></span></h2>
+    <p class="sub" data-i="s2Sub"></p>
+    <div class="tbl-wrap"><table class="tbl" id="recTable"><thead><tr><th data-i="colSetting"></th><th data-i="colValue"></th></tr></thead><tbody></tbody></table></div>
+    <p class="note" data-i="manualNote"></p>
+  </section>
+
+  <!-- 3. INI -->
+  <section class="card" id="s3">
+    <h2><span class="num">3</span><span data-i="s3Title"></span></h2>
+    <p class="sub" data-i="s3Sub"></p>
+    <div class="warn"><b data-i="warnTitle"></b><span data-i="warnText"></span></div>
+    <ol class="steps" id="iniSteps"></ol>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept=".ini">
+      <div><strong data-i="uploadLabel"></strong></div>
+      <div class="note" data-i="uploadHint"></div>
+    </label>
+    <div class="status" id="fileStatus"></div>
+    <div id="iniResult" class="hidden">
+      <div class="tbl-wrap"><table class="tbl" id="chgTable"><thead><tr><th data-i="colSetting"></th><th data-i="colBefore"></th><th data-i="colKey"></th><th data-i="colAfter"></th></tr></thead><tbody></tbody></table></div>
+      <p class="note" id="dlssNote"></p>
+      <div class="row">
+        <button class="btn primary" id="dlIni" type="button"><span data-i="downloadIni"></span></button>
+        <button class="btn" id="dlOrig" type="button"><span data-i="downloadOrig"></span></button>
+      </div>
+      <ol class="steps" id="afterSteps"></ol>
+    </div>
+  </section>
+
+  <!-- 4. NVIDIA -->
+  <section class="card" id="s4">
+    <h2><span class="num">4</span><span data-i="s4Title"></span></h2>
+    <p class="sub" data-i="s4Sub"></p>
+    <div id="nvBlock">
+      <div class="tbl-wrap"><table class="tbl" id="nvTable"><thead><tr><th data-i="colSetting"></th><th data-i="colValue"></th></tr></thead><tbody></tbody></table></div>
+      <div class="row"><button class="btn primary" id="dlNip" type="button"><span data-i="downloadNip"></span></button></div>
+      <ol class="steps" id="nvSteps"></ol>
+      <p class="note" data-i="nvKeep"></p>
+    </div>
+    <p class="warn hidden" id="nvNo" data-i="nvNotNvidia"></p>
+  </section>
+
+  <!-- 5. Extras -->
+  <section class="card" id="s5">
+    <h2><span class="num">5</span><span data-i="s5Title"></span></h2>
+    <ul class="tips" id="tips"></ul>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p data-i="footPrivacy"></p>
+    <p data-i="footScript"></p>
+    <p data-i="footCredits"></p>
+    <p data-i="footDisclaimer"></p>
+  </div>
+</footer>
+
+<script>
+/* ====================================================================
+   Delta Force Tweaker - web version
+   Version is shared with the .cmd script and CHANGELOG.md.
+   ==================================================================== */
+const VERSION = '1.0.0';
+const REPO_URL = 'https://github.com/j0p3s/Delta-Force-Tweaker';
+const NPI_URL  = 'https://github.com/j0p3s/nvidiaProfileInspector';
+const NPI_UPSTREAM = 'https://github.com/Orbmu2k/nvidiaProfileInspector';
+</script>
+
+<script id="core">
+/* ---------------- Core logic (no DOM) ----------------
+   Value scales confirmed against the in-game menu (game version 1.102.37117):
+   Quality:  0 Low | 1 Medium | 2 High | 3 Ultra | 4 Extreme | 5 Ultimate
+   AO:       0 Off | 1 Medium | 2 High | 3 Ultra | 4 Extreme | 5 Ultimate
+   DLSS:     0 Auto | 1 Ultra Performance | 2 Performance | 3 Balanced | 4 Quality
+   FPS cap:  0 Unlimited | 1 30 | 2 60 | 3 75 | 4 100 | 5 120 | 6 144
+   Reflex:   0 Off | 1 Low Latency | 2 Enhanced
+   GraphicsPreset 0 = Custom. SuperResolutionMethod is not positional (DLSS = 4) and is never changed.
+   The game omits keys that are at their default value, so missing keys are added. */
+const Core = (() => {
+  const QN = ['Low', 'Medium', 'High', 'Ultra', 'Extreme', 'Ultimate'];
+  const AON = ['Off', 'Medium', 'High', 'Ultra', 'Extreme', 'Ultimate'];
+  const DLSSN = ['Auto', 'Ultra Performance', 'Performance', 'Balanced', 'Quality'];
+  const RFXN = ['Off', 'Low Latency', 'Enhanced'];
+  const FPS = { 30: 1, 60: 2, 75: 3, 100: 4, 120: 5, 144: 6 };
+  const SECTION = '[/Script/GPGlobalDefines.ClientVideoSettingHD]';
+
+  // GPU series: cap = highest tier allowed, kind = upscaler/feature family
+  const SERIES = {
+    nvidia: [
+      ['rtx50', 'GeForce RTX 50', 3, 'rtx'], ['rtx40', 'GeForce RTX 40', 3, 'rtx'], ['rtx30', 'GeForce RTX 30', 3, 'rtx'],
+      ['rtx20', 'GeForce RTX 20', 3, 'rtx'], ['gtx16', 'GeForce GTX 16', 1, 'gtx'], ['gtx10hi', 'GeForce GTX 1070 / 1080', 2, 'gtx'],
+      ['gtx10lo', 'GeForce GTX 1050 / 1060', 1, 'gtx'], ['gtx9', 'GeForce GTX 900', 1, 'gtx']
+    ],
+    amd: [
+      ['rx9000', 'Radeon RX 9000', 3, 'amd'], ['rx7000', 'Radeon RX 7000', 3, 'amd'], ['rx6000', 'Radeon RX 6000', 3, 'amd'],
+      ['rx5000', 'Radeon RX 5600 / 5700', 2, 'amd'], ['rx500', 'Radeon RX 400 / 500', 1, 'amd'], ['vega', 'Radeon Vega 56 / 64', 2, 'amd']
+    ],
+    intel: [['arcB', 'Intel Arc B-series', 3, 'arc'], ['arcA', 'Intel Arc A-series', 3, 'arc']],
+    igpu: [['igpuIntel', 'Intel UHD / Iris Xe', 0, 'igpu'], ['igpuAmd', 'AMD Radeon Graphics (APU)', 0, 'igpu']]
+  };
+
+  function findSeries(id) {
+    for (const v of Object.keys(SERIES)) for (const s of SERIES[v]) if (s[0] === id) return { vendor: v, id: s[0], name: s[1], cap: s[2], kind: s[3] };
+    return null;
+  }
+
+  // Same tier rules as the .cmd script
+  function computeTier(hw) {
+    const s = findSeries(hw.series) || { cap: 3, kind: 'rtx' };
+    let tier, reason = 'vram';
+    if (hw.vram < 4) tier = 0; else if (hw.vram < 6) tier = 1; else if (hw.vram < 10) tier = 2; else tier = 3;
+    if (s.kind === 'igpu') { tier = 0; reason = 'integrated'; }
+    if (tier > s.cap) { tier = s.cap; reason = 'older'; }
+    if (hw.ram < 12 || hw.threads < 6) { if (tier > 1) { tier = 1; reason = 'ramcpu'; } }
+    else if (hw.ram < 16 || hw.threads < 8) { if (tier > 2) { tier = 2; reason = 'ramcpu'; } }
+    let tex;
+    if (hw.vram < 4) tex = 0; else if (hw.vram < 6) tex = 1; else if (hw.vram < 8) tex = 2; else tex = 3;
+    if (s.kind === 'igpu') tex = 0;
+    return { tier, reason, tex, kind: s.kind };
+  }
+
+  function fpsIndex(target) {
+    if (target <= 0) return { idx: 0, txt: 'Unlimited' };
+    if (FPS[target] !== undefined) return { idx: FPS[target], txt: String(target) };
+    if (target > 144) return { idx: 0, txt: 'Unlimited', note: 'noHz' };
+    const keys = Object.keys(FPS).map(Number).filter(k => k <= target).sort((a, b) => b - a);
+    const best = keys.length ? keys[0] : 30;
+    return { idx: FPS[best], txt: String(best) };
+  }
+
+  function upscaler(kind) {
+    return { rtx: 'Nvidia DLSS', gtx: 'FSR - Quality', amd: 'FSR - Quality', arc: 'XeSS - Quality', igpu: 'FSR - Balanced' }[kind] || 'FSR - Quality';
+  }
+
+  // Ordered list of [iniKey, menuName, value, scale, text?]
+  function profile(hw, mode) {
+    const r = computeTier(hw);
+    const t = Math.min(r.tier, 3), c = mode === 'Competitive';
+    const min = Math.min, max = Math.max;
+    const p = [
+      ['TextureQuality', 'Textures', r.tex, 'Q'],
+      ['GraphicsPreset', 'Graphics Preset', 0, 'PRE'],
+      ['ShadowQuality', 'Shadows', c ? 0 : min(t, 2), 'Q'],
+      ['ViewDistanceLevel', 'Scene View Distance', c ? max(min(t, 2), 1) : t, 'Q'],
+      ['TextureFilteringQuality', 'Texture Filtering', min(max(t, 2), 3), 'Q'],
+      ['StreamingQuality', 'Streaming', c ? min(t, 1) : min(t, 2), 'Q'],
+      ['SceneDetailLevel', 'Scene Details', c ? 0 : t, 'Q'],
+      ['ShadingQuality', 'Shaders', c ? 0 : min(t, 2), 'Q'],
+      ['ShadowMapResolution', 'Shadow Map', c ? 0 : min(t, 2), 'Q'],
+      ['GIQuality', 'Lumen (GI)', (!c && t >= 3) ? 3 : 0, 'Q'],
+      ['ReflectionQuality', 'Reflections', c ? 0 : max(t - 1, 0), 'Q'],
+      ['AmbientOcclusionQuality', 'Ambient Occlusion', (!c && t >= 2) ? 2 : 0, 'AO'],
+      ['ParticleQuality', 'Particles', c ? 0 : min(t, 2), 'Q'],
+      ['DistortionQuality', 'Distortion', c ? 0 : min(t, 2), 'Q'],
+      ['PostProcessQuality', 'Post-Processing', c ? 0 : min(t, 2), 'Q'],
+      ['VolumetricFogQuality', 'Volumetric Fog', c ? 0 : min(t, 2), 'Q'],
+      ['AnimationQuality', 'Animation', c ? 0 : min(t, 2), 'Q']
+    ];
+    if (r.kind === 'rtx') p.push(['SuperResolutionQualityDLSS', 'Super Resolution (DLSS)', c ? 3 : 4, 'DLSS']);
+    if (r.kind === 'rtx' || r.kind === 'gtx') p.push(['NVIDIAReflexMode', 'NVIDIA REFLEX Low Latency', c ? 2 : 1, 'RFX']);
+    const f = fpsIndex(c ? 0 : hw.hz);
+    p.push(['MaxFPS', 'In-Match Frame Rate Cap', f.idx, 'FPS', f.txt, f.note]);
+    return { items: p, tier: r };
+  }
+
+  function valueName(e) {
+    switch (e[3]) {
+      case 'Q': return QN[e[2]];
+      case 'AO': return AON[e[2]];
+      case 'DLSS': return DLSSN[e[2]];
+      case 'RFX': return RFXN[e[2]];
+      case 'FPS': return e[4];
+      case 'PRE': return 'Custom';
+    }
+    return String(e[2]);
+  }
+
+  // ---- INI encoding helpers ----
+  function decode(buf) {
+    const b = new Uint8Array(buf);
+    if (b.length >= 2 && b[0] === 0xFF && b[1] === 0xFE) return { enc: 'utf16le', text: new TextDecoder('utf-16le').decode(b.subarray(2)) };
+    if (b.length >= 3 && b[0] === 0xEF && b[1] === 0xBB && b[2] === 0xBF) return { enc: 'utf8bom', text: new TextDecoder('utf-8').decode(b.subarray(3)) };
+    return { enc: 'utf8', text: new TextDecoder('utf-8').decode(b) };
+  }
+  function encode(text, enc) {
+    if (enc === 'utf16le') {
+      const out = new Uint8Array(2 + text.length * 2);
+      out[0] = 0xFF; out[1] = 0xFE;
+      for (let i = 0; i < text.length; i++) { const c = text.charCodeAt(i); out[2 + i * 2] = c & 0xFF; out[3 + i * 2] = c >> 8; }
+      return out;
+    }
+    const u = new TextEncoder().encode(text);
+    if (enc === 'utf8bom') { const out = new Uint8Array(u.length + 3); out.set([0xEF, 0xBB, 0xBF]); out.set(u, 3); return out; }
+    return u;
+  }
+
+  // Applies a profile to UserSystemSettingHD.ini text. Returns { ok, text, changes, dlssSkipped }
+  function applyIni(text, items) {
+    const lines = text.split(/\r?\n/);
+    if (lines.length && lines[lines.length - 1] === '') lines.pop();
+    let start = -1, end = lines.length;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].trim() === SECTION) { start = i; continue; }
+      if (start >= 0 && /^\[/.test(lines[i].trim())) { end = i; break; }
+    }
+    if (start < 0) return { ok: false };
+    let method = '';
+    for (let i = start + 1; i < end; i++) { const m = lines[i].match(/^SuperResolutionMethod=(.*)$/); if (m) { method = m[1].trim(); break; } }
+    const changes = []; let dlssSkipped = false;
+    for (const e of items) {
+      const key = e[0], val = String(e[2]);
+      if (key === 'SuperResolutionQualityDLSS' && method !== '4') { dlssSkipped = true; continue; }
+      let done = false;
+      for (let i = start + 1; i < end; i++) {
+        const m = lines[i].match(new RegExp('^' + key + '=(.*)$'));
+        if (m) {
+          const old = m[1];
+          lines[i] = key + '=' + val;
+          changes.push({ e, key, old, status: old === val ? 'same' : 'chg' });
+          done = true; break;
+        }
+      }
+      if (!done) {
+        let ins = end;
+        while (ins > start + 1 && lines[ins - 1].trim() === '') ins--;
+        lines.splice(ins, 0, key + '=' + val);
+        end++;
+        changes.push({ e, key, old: null, status: 'add' });
+      }
+    }
+    return { ok: true, text: lines.join('\r\n') + '\r\n', changes, dlssSkipped };
+  }
+
+  // ---- NVIDIA Profile Inspector .nip ----
+  // NVAPI setting IDs verified against the Profile Inspector source code
+  const NV_SETTINGS = [
+    ['Power management mode', 0x1057EB71, 1, 'nvPower'],
+    ['Texture filtering - Quality', 0x00CE2691, 20, 'nvTexQ'],
+    ['Texture filtering - Anisotropic sample optimization', 0x00E73211, 1, 'nvAniso'],
+    ['Texture filtering - Negative LOD bias', 0x0019BB68, 0, 'nvLod'],
+    ['Maximum pre-rendered frames', 0x007BA09E, 1, 'nvPre'],
+    ['Threaded optimization', 0x20C1221E, 1, 'nvThread'],
+    ['Enable FXAA', 0x1074C972, 0, 'nvFxaa']
+  ];
+  // Executables NVIDIA's official "Delta Force" profile uses (driver 621.01)
+  const NV_EXES = ['deltaforce.exe', 'bhdclient-win64-shipping.exe', 'deltaforce-win64-shipping.exe', 'deltaforceclient-win64-shipping.exe'];
+
+  function buildNip() {
+    const x = [];
+    x.push('<?xml version="1.0" encoding="utf-8"?>', '<ArrayOfProfile>', '  <Profile>', '    <ProfileName>Delta Force</ProfileName>', '    <Executeables>');
+    for (const e of NV_EXES) x.push('      <string>' + e + '</string>');
+    x.push('    </Executeables>', '    <Settings>');
+    for (const s of NV_SETTINGS) {
+      x.push('      <ProfileSetting>', '        <SettingNameInfo>' + s[0] + '</SettingNameInfo>',
+        '        <SettingID>' + (s[1] >>> 0) + '</SettingID>', '        <SettingValue>' + (s[2] >>> 0) + '</SettingValue>',
+        '        <ValueType>Dword</ValueType>', '      </ProfileSetting>');
+    }
+    x.push('    </Settings>', '  </Profile>', '</ArrayOfProfile>');
+    return x.join('\r\n') + '\r\n';
+  }
+
+  // ---- WebGL renderer string -> vendor/series ----
+  function parseRenderer(r) {
+    if (!r) return null;
+    const s = r.replace(/\(R\)|\(TM\)/gi, '');
+    let m;
+    if ((m = s.match(/RTX\s*(\d)0\d0/i)) || (m = s.match(/RTX\s*(\d)\d{2}/i))) {
+      const g = { '5': 'rtx50', '4': 'rtx40', '3': 'rtx30', '2': 'rtx20' }[m[1]];
+      if (g) return { vendor: 'nvidia', series: g };
+    }
+    if ((m = s.match(/GTX\s*16\d{2}/i))) return { vendor: 'nvidia', series: 'gtx16' };
+    if ((m = s.match(/GTX\s*10([5-8])0/i))) return { vendor: 'nvidia', series: (m[1] >= '7') ? 'gtx10hi' : 'gtx10lo' };
+    if ((m = s.match(/GTX\s*9\d{2}/i))) return { vendor: 'nvidia', series: 'gtx9' };
+    if ((m = s.match(/RX\s*(\d)(\d)\d{2}/i))) {
+      const g = { '9': 'rx9000', '7': 'rx7000', '6': 'rx6000', '5': 'rx5000' }[m[1]];
+      if (g) return { vendor: 'amd', series: g };
+    }
+    if (/RX\s*[45]\d{2}\b/i.test(s)) return { vendor: 'amd', series: 'rx500' };
+    if (/Vega\s*(56|64)/i.test(s)) return { vendor: 'amd', series: 'vega' };
+    if (/Arc.*\bB\d{3}/i.test(s)) return { vendor: 'intel', series: 'arcB' };
+    if (/Arc/i.test(s)) return { vendor: 'intel', series: 'arcA' };
+    if (/Intel.*(UHD|Iris|HD Graphics)/i.test(s)) return { vendor: 'igpu', series: 'igpuIntel' };
+    if (/Radeon.*Graphics/i.test(s) && !/RX/i.test(s)) return { vendor: 'igpu', series: 'igpuAmd' };
+    return null;
+  }
+
+  return { QN, SERIES, findSeries, computeTier, fpsIndex, upscaler, profile, valueName, decode, encode, applyIni, buildNip, NV_SETTINGS, NV_EXES, parseRenderer };
+})();
+</script>
+
+<script id="i18n">
+/* ---------------- Translations ----------------
+   Setting and value names stay in English because they must match the game's English menu
+   and the file. Add a language by copying the "en" block. */
+const I18N = {
+  en: {
+    _name: 'English',
+    heroTitle: 'Tune Delta Force for your PC',
+    heroText: 'Choose your hardware, get recommended graphics settings, an edited UserSystemSettingHD.ini and an NVIDIA Profile Inspector profile. No download of unknown scripts needed.',
+    badge1: 'Runs 100% in your browser', badge2: 'Your files never leave your PC', badge3: 'Scales verified in the game menu',
+    s1Title: 'Your hardware', s1Sub: 'Pick what is in your PC. The tier decides the recommended settings.',
+    gpuVendor: 'Graphics card brand', gpuSeries: 'Graphics card series', vram: 'Video memory (VRAM)', ram: 'System memory (RAM)',
+    threads: 'CPU threads', resolution: 'Screen resolution', refresh: 'Monitor refresh rate',
+    vendor_nvidia: 'NVIDIA', vendor_amd: 'AMD', vendor_intel: 'Intel Arc', vendor_igpu: 'Integrated graphics (no dedicated GPU)',
+    detectBtn: 'Detect automatically', detectNote: 'Detects CPU threads, screen and usually the GPU. VRAM and RAM must be checked by hand.',
+    detectDone: 'Detected: {items}. Please check VRAM and RAM.', detectNone: 'Your browser did not reveal the hardware. Please choose it by hand.',
+    profBalanced: 'Balanced', profBalancedDesc: 'Best quality your hardware can run smoothly.',
+    profCompetitive: 'Competitive', profCompetitiveDesc: 'Maximum FPS and visibility. Lower effects, high view distance.',
+    tierLabel: 'Hardware tier:', tier0: 'Low', tier1: 'Medium', tier2: 'High', tier3: 'Epic',
+    reason_vram: '(based on VRAM)', reason_integrated: '(integrated GPU)', reason_older: '(limited by GPU generation)', reason_ramcpu: '(limited by RAM/CPU)',
+    s2Title: 'Recommended in-game settings', s2Sub: 'Settings > GRAPHICS. Names as shown in the game in English.',
+    colSetting: 'Setting', colValue: 'Value', colBefore: 'Before', colAfter: 'After', colKey: 'File key',
+    rowDisplayMode: 'Display Mode', valDisplayMode: 'Fullscreen or Borderless Windowed', rowVsync: 'V-sync',
+    rowSRMode: 'Super Resolution Mode', rowFG: 'DLSS Frame Generation', rowDof: 'Depth of Field / Weapon Motion Blur', rowFov: 'Default FOV',
+    noHz: 'the menu has no option for your refresh rate',
+    manualNote: 'Display Mode, V-sync, Super Resolution Mode, Frame Generation, Depth of Field and FOV are not changed by the file: set them in the game.',
+    s3Title: 'Apply to your game file (optional)', s3Sub: 'Load your UserSystemSettingHD.ini and download an edited copy with the settings above. Nothing is uploaded: the file is processed in your browser.',
+    warnTitle: 'Read before you start',
+    warnText: 'Team Jade has warned that changing config files outside the game may lead to anti-cheat penalties. This file is not one of the token-protected ones and only gets values the menu also allows, but it is still a change made outside the game. Use it at your own risk; the risk-free way is to set the values from step 2 in the menu.',
+    iniSteps: [
+      'Close Delta Force. In the game first: Settings → press <kbd>S</kbd> (Config Management) → make sure <b>LocalConfig</b> is <b>APPLIED</b>, then exit from the game menu.',
+      'Open Steam → <b>Library</b>, right-click <b>Delta Force</b> → <b>Manage</b> → <b>Browse local files</b>.',
+      'Open the folder <code>Game\\DeltaForce\\Saved\\Config\\WindowsClient</code>.',
+      'Copy <code>UserSystemSettingHD.ini</code> to a safe place as a backup, then select it below.'
+    ],
+    uploadLabel: 'Select or drop UserSystemSettingHD.ini', uploadHint: 'Only this file is needed. Never edit Engine.ini, Scalability.ini, DeviceProfiles.ini or GPSystemSetting.ini.',
+    fileOk: 'File read: {n} settings will be written.', fileErr: 'This does not look like UserSystemSettingHD.ini (graphics section not found). Nothing was changed.', fileName: 'The file should be called UserSystemSettingHD.ini.',
+    tagChg: 'changed', tagAdd: 'added', tagSame: 'same',
+    dlssSkipped: 'Your game is not using Nvidia DLSS, so the DLSS quality was not changed. Select Nvidia DLSS in the game if you want it.',
+    downloadIni: 'Download edited UserSystemSettingHD.ini', downloadOrig: 'Download backup of the original',
+    afterSteps: [
+      'Put the downloaded file in the <code>WindowsClient</code> folder, replacing the old one (same name).',
+      'Open the game and check Settings → GRAPHICS. <b>Graphics Preset</b> should show <b>Custom</b>.',
+      'Press <kbd>S</kbd> and confirm <b>LocalConfig</b> is still <b>APPLIED</b>. If a Cloud Config overwrote the values, apply LocalConfig again.'
+    ],
+    s4Title: 'NVIDIA driver profile (optional)', s4Sub: 'A profile for NVIDIA Profile Inspector with low-latency, stable-frametime driver settings for Delta Force only.',
+    nvPower: 'Prefer maximum performance', nvTexQ: 'High performance', nvAniso: 'On', nvLod: 'Allow (keeps DLSS/FSR sharp)', nvPre: '1 (low latency)', nvThread: 'On (the game runs in DirectX 11)', nvFxaa: 'Off',
+    downloadNip: 'Download NVIDIA profile (.nip)',
+    nvSteps: [
+      'Download <b>NVIDIA Profile Inspector</b> from <a href="{npi}" target="_blank" rel="noopener">{npiShort}</a> (Releases) and extract it.',
+      'Open <code>nvidiaProfileInspector.exe</code> and click the <b>Import user defined profiles</b> button in the toolbar. Select <code>DeltaForce_NVIDIA.nip</code>.',
+      'If asked, choose <b>Merge</b>: it keeps the rest of NVIDIA\'s official Delta Force profile.',
+      'Select the <b>Delta Force</b> profile to check the values and click <b>Apply changes</b>.'
+    ],
+    nvKeep: 'V-sync and G-SYNC are not touched: NVIDIA\'s official profile keeps them as NVIDIA set them.',
+    nvNotNvidia: 'You chose a non-NVIDIA graphics card, so this step does not apply.',
+    s5Title: 'Extra tips',
+    tips: [
+      '<b>Skip the intro videos:</b> in <code>Game\\DeltaForce\\Content\\Movies_HD</code> rename <code>V_logo_HD.bin</code>, <code>V_logo2_HD.bin</code> and <code>V_logo2_looping_HD.bin</code> to <code>.bak</code>. A game update may bring them back.',
+      '<b>Windows:</b> Settings → Gaming → turn <b>Game Mode</b> on; Settings → System → Display → Graphics → turn <b>Hardware-accelerated GPU scheduling</b> on (needs a restart).',
+      '<b>Windows 11:</b> in the same Graphics page, turn <b>Optimizations for windowed games</b> on if you play in Borderless Windowed.',
+      '<b>Laptops:</b> Settings → System → Display → Graphics → add <code>DeltaForceClient-Win64-Shipping.exe</code> and choose <b>High performance</b>.',
+      '<b>Stutter after a driver update:</b> use <b>Recompile Shaders</b> (key <kbd>G</kbd>) in the game\'s Settings.'
+    ],
+    footPrivacy: 'Privacy: this page has no server, no tracking and no uploads. Everything runs in your browser.',
+    footScript: 'Prefer automation? The <a href="{repo}">GitHub repository</a> also has the open-source Windows script that does all of this for you.',
+    footCredits: 'NVIDIA Profile Inspector by Orbmu2k (<a href="{up}" target="_blank" rel="noopener">original project</a>).',
+    footDisclaimer: 'Not affiliated with Team Jade, TiMi Studio Group, Tencent or NVIDIA. Delta Force is a trademark of its owners. Use at your own risk.'
+  },
+  pt: {
+    _name: 'Português',
+    heroTitle: 'Afina o Delta Force para o teu PC',
+    heroText: 'Escolhe o teu hardware e recebe as definições gráficas recomendadas, um UserSystemSettingHD.ini já editado e um perfil para o NVIDIA Profile Inspector. Sem descarregar scripts desconhecidos.',
+    badge1: 'Funciona 100% no navegador', badge2: 'Os teus ficheiros nunca saem do PC', badge3: 'Escalas confirmadas no menu do jogo',
+    s1Title: 'O teu hardware', s1Sub: 'Escolhe o que tens no PC. O nível decide as definições recomendadas.',
+    gpuVendor: 'Marca da placa gráfica', gpuSeries: 'Série da placa gráfica', vram: 'Memória de vídeo (VRAM)', ram: 'Memória do sistema (RAM)',
+    threads: 'Threads do processador', resolution: 'Resolução do ecrã', refresh: 'Frequência do monitor',
+    vendor_nvidia: 'NVIDIA', vendor_amd: 'AMD', vendor_intel: 'Intel Arc', vendor_igpu: 'Gráfica integrada (sem placa dedicada)',
+    detectBtn: 'Detetar automaticamente', detectNote: 'Deteta as threads do processador, o ecrã e normalmente a placa gráfica. A VRAM e a RAM têm de ser confirmadas à mão.',
+    detectDone: 'Detetado: {items}. Confirma a VRAM e a RAM.', detectNone: 'O navegador não revelou o hardware. Escolhe-o à mão.',
+    profBalanced: 'Equilibrado', profBalancedDesc: 'A melhor qualidade que o teu hardware aguenta com fluidez.',
+    profCompetitive: 'Competitivo', profCompetitiveDesc: 'Máximo de FPS e visibilidade. Menos efeitos, distância de visão alta.',
+    tierLabel: 'Nível do hardware:', tier0: 'Baixo', tier1: 'Médio', tier2: 'Alto', tier3: 'Épico',
+    reason_vram: '(pela VRAM)', reason_integrated: '(gráfica integrada)', reason_older: '(limitado pela geração da placa)', reason_ramcpu: '(limitado pela RAM/CPU)',
+    s2Title: 'Definições recomendadas no jogo', s2Sub: 'Settings > GRAPHICS. Nomes como aparecem no jogo em inglês.',
+    colSetting: 'Opção', colValue: 'Valor', colBefore: 'Antes', colAfter: 'Depois', colKey: 'Chave no ficheiro',
+    rowDisplayMode: 'Display Mode', valDisplayMode: 'Fullscreen ou Borderless Windowed', rowVsync: 'V-sync',
+    rowSRMode: 'Super Resolution Mode', rowFG: 'DLSS Frame Generation', rowDof: 'Depth of Field / Weapon Motion Blur', rowFov: 'Default FOV',
+    noHz: 'o menu não tem a frequência do teu monitor',
+    manualNote: 'Display Mode, V-sync, Super Resolution Mode, Frame Generation, Depth of Field e FOV não são alterados pelo ficheiro: muda-os no jogo.',
+    s3Title: 'Aplicar no ficheiro do jogo (opcional)', s3Sub: 'Carrega o teu UserSystemSettingHD.ini e descarrega uma cópia editada com as definições acima. Nada é enviado: o ficheiro é tratado no teu navegador.',
+    warnTitle: 'Lê antes de começar',
+    warnText: 'A Team Jade avisou que alterar ficheiros de configuração fora do jogo pode dar penalizações do anti-cheat. Este ficheiro não é um dos protegidos com Token e só recebe valores que o menu também permite, mas continua a ser uma alteração feita fora do jogo. Usa por tua conta e risco; a forma sem risco é escolher no menu os valores do passo 2.',
+    iniSteps: [
+      'Fecha o Delta Force. Antes, no jogo: Settings → carrega em <kbd>S</kbd> (Config Management) → confirma que a <b>LocalConfig</b> está <b>APPLIED</b> e sai pelo menu do jogo.',
+      'Abre a Steam → <b>Biblioteca</b>, clica com o botão direito em <b>Delta Force</b> → <b>Gerir</b> → <b>Procurar ficheiros locais</b>.',
+      'Abre a pasta <code>Game\\DeltaForce\\Saved\\Config\\WindowsClient</code>.',
+      'Copia o <code>UserSystemSettingHD.ini</code> para um sítio seguro (cópia de segurança) e escolhe-o aqui em baixo.'
+    ],
+    uploadLabel: 'Escolhe ou arrasta o UserSystemSettingHD.ini', uploadHint: 'Só precisas deste ficheiro. Nunca edites o Engine.ini, Scalability.ini, DeviceProfiles.ini ou GPSystemSetting.ini.',
+    fileOk: 'Ficheiro lido: vão ser escritas {n} definições.', fileErr: 'Isto não parece o UserSystemSettingHD.ini (secção de gráficos não encontrada). Nada foi alterado.', fileName: 'O ficheiro deve chamar-se UserSystemSettingHD.ini.',
+    tagChg: 'alterado', tagAdd: 'acrescentado', tagSame: 'igual',
+    dlssSkipped: 'O teu jogo não está a usar Nvidia DLSS, por isso a qualidade do DLSS não foi alterada. Escolhe Nvidia DLSS no jogo se o quiseres.',
+    downloadIni: 'Descarregar o UserSystemSettingHD.ini editado', downloadOrig: 'Descarregar cópia do original',
+    afterSteps: [
+      'Põe o ficheiro descarregado na pasta <code>WindowsClient</code>, substituindo o antigo (mesmo nome).',
+      'Abre o jogo e confirma em Settings → GRAPHICS. O <b>Graphics Preset</b> deve aparecer como <b>Custom</b>.',
+      'Carrega em <kbd>S</kbd> e confirma que a <b>LocalConfig</b> continua <b>APPLIED</b>. Se uma Cloud Config tiver substituído os valores, aplica outra vez a LocalConfig.'
+    ],
+    s4Title: 'Perfil do driver NVIDIA (opcional)', s4Sub: 'Um perfil para o NVIDIA Profile Inspector com definições de driver para baixa latência e frametimes estáveis, só para o Delta Force.',
+    nvPower: 'Preferir desempenho máximo', nvTexQ: 'Alto desempenho', nvAniso: 'Ligado', nvLod: 'Permitir (mantém o DLSS/FSR nítido)', nvPre: '1 (baixa latência)', nvThread: 'Ligado (o jogo corre em DirectX 11)', nvFxaa: 'Desligado',
+    downloadNip: 'Descarregar perfil NVIDIA (.nip)',
+    nvSteps: [
+      'Descarrega o <b>NVIDIA Profile Inspector</b> em <a href="{npi}" target="_blank" rel="noopener">{npiShort}</a> (Releases) e extrai-o.',
+      'Abre o <code>nvidiaProfileInspector.exe</code> e clica no botão <b>Import user defined profiles</b> da barra de ferramentas. Escolhe o <code>DeltaForce_NVIDIA.nip</code>.',
+      'Se perguntar, escolhe <b>Merge</b>: mantém o resto do perfil oficial da NVIDIA para o Delta Force.',
+      'Escolhe o perfil <b>Delta Force</b> para confirmar os valores e clica em <b>Apply changes</b>.'
+    ],
+    nvKeep: 'O V-sync e o G-SYNC não são alterados: ficam como a NVIDIA os definiu no perfil oficial.',
+    nvNotNvidia: 'Escolheste uma placa que não é NVIDIA, por isso este passo não se aplica.',
+    s5Title: 'Dicas extra',
+    tips: [
+      '<b>Saltar os vídeos de introdução:</b> em <code>Game\\DeltaForce\\Content\\Movies_HD</code> muda o nome de <code>V_logo_HD.bin</code>, <code>V_logo2_HD.bin</code> e <code>V_logo2_looping_HD.bin</code> para <code>.bak</code>. Uma atualização do jogo pode repô-los.',
+      '<b>Windows:</b> Definições → Jogos → liga o <b>Modo de Jogo</b>; Definições → Sistema → Ecrã → Gráficos → liga o <b>Agendamento de GPU acelerado por hardware</b> (precisa de reiniciar).',
+      '<b>Windows 11:</b> na mesma página de Gráficos, liga as <b>Otimizações para jogos em janela</b> se jogas em Borderless Windowed.',
+      '<b>Portáteis:</b> Definições → Sistema → Ecrã → Gráficos → adiciona o <code>DeltaForceClient-Win64-Shipping.exe</code> e escolhe <b>Alto desempenho</b>.',
+      '<b>Engasgos depois de atualizar o driver:</b> usa <b>Recompile Shaders</b> (tecla <kbd>G</kbd>) nas Settings do jogo.'
+    ],
+    footPrivacy: 'Privacidade: esta página não tem servidor, nem rastreio, nem envio de ficheiros. Tudo corre no teu navegador.',
+    footScript: 'Preferes automatizar? O <a href="{repo}">repositório no GitHub</a> tem também o script de código aberto para Windows que faz tudo isto por ti.',
+    footCredits: 'NVIDIA Profile Inspector por Orbmu2k (<a href="{up}" target="_blank" rel="noopener">projeto original</a>).',
+    footDisclaimer: 'Sem ligação à Team Jade, TiMi Studio Group, Tencent ou NVIDIA. Delta Force é uma marca dos respetivos donos. Usa por tua conta e risco.'
+  },
+  es: {
+    _name: 'Español',
+    heroTitle: 'Ajusta Delta Force para tu PC',
+    heroText: 'Elige tu hardware y obtén los ajustes gráficos recomendados, un UserSystemSettingHD.ini ya editado y un perfil para NVIDIA Profile Inspector. Sin descargar scripts desconocidos.',
+    badge1: 'Funciona 100 % en tu navegador', badge2: 'Tus archivos nunca salen de tu PC', badge3: 'Escalas verificadas en el menú del juego',
+    s1Title: 'Tu hardware', s1Sub: 'Elige lo que tiene tu PC. El nivel decide los ajustes recomendados.',
+    gpuVendor: 'Marca de la tarjeta gráfica', gpuSeries: 'Serie de la tarjeta gráfica', vram: 'Memoria de vídeo (VRAM)', ram: 'Memoria del sistema (RAM)',
+    threads: 'Hilos del procesador', resolution: 'Resolución de pantalla', refresh: 'Frecuencia del monitor',
+    vendor_nvidia: 'NVIDIA', vendor_amd: 'AMD', vendor_intel: 'Intel Arc', vendor_igpu: 'Gráficos integrados (sin tarjeta dedicada)',
+    detectBtn: 'Detectar automáticamente', detectNote: 'Detecta los hilos del procesador, la pantalla y normalmente la gráfica. La VRAM y la RAM se comprueban a mano.',
+    detectDone: 'Detectado: {items}. Comprueba la VRAM y la RAM.', detectNone: 'Tu navegador no mostró el hardware. Elígelo a mano.',
+    profBalanced: 'Equilibrado', profBalancedDesc: 'La mejor calidad que tu hardware mueve con fluidez.',
+    profCompetitive: 'Competitivo', profCompetitiveDesc: 'Máximo de FPS y visibilidad. Menos efectos, distancia de visión alta.',
+    tierLabel: 'Nivel del hardware:', tier0: 'Bajo', tier1: 'Medio', tier2: 'Alto', tier3: 'Épico',
+    reason_vram: '(según la VRAM)', reason_integrated: '(gráficos integrados)', reason_older: '(limitado por la generación de la gráfica)', reason_ramcpu: '(limitado por la RAM/CPU)',
+    s2Title: 'Ajustes recomendados en el juego', s2Sub: 'Settings > GRAPHICS. Nombres como aparecen en el juego en inglés.',
+    colSetting: 'Ajuste', colValue: 'Valor', colBefore: 'Antes', colAfter: 'Después', colKey: 'Clave del archivo',
+    rowDisplayMode: 'Display Mode', valDisplayMode: 'Fullscreen o Borderless Windowed', rowVsync: 'V-sync',
+    rowSRMode: 'Super Resolution Mode', rowFG: 'DLSS Frame Generation', rowDof: 'Depth of Field / Weapon Motion Blur', rowFov: 'Default FOV',
+    noHz: 'el menú no tiene la frecuencia de tu monitor',
+    manualNote: 'Display Mode, V-sync, Super Resolution Mode, Frame Generation, Depth of Field y FOV no se cambian en el archivo: ajústalos en el juego.',
+    s3Title: 'Aplicar al archivo del juego (opcional)', s3Sub: 'Carga tu UserSystemSettingHD.ini y descarga una copia editada con los ajustes de arriba. No se sube nada: el archivo se procesa en tu navegador.',
+    warnTitle: 'Lee esto antes de empezar',
+    warnText: 'Team Jade ha advertido que modificar archivos de configuración fuera del juego puede causar sanciones del anticheat. Este archivo no es uno de los protegidos con token y solo recibe valores que el menú también permite, pero sigue siendo un cambio hecho fuera del juego. Úsalo bajo tu responsabilidad; la opción sin riesgo es poner los valores del paso 2 en el menú.',
+    iniSteps: [
+      'Cierra Delta Force. Antes, en el juego: Settings → pulsa <kbd>S</kbd> (Config Management) → comprueba que <b>LocalConfig</b> está <b>APPLIED</b> y sal desde el menú del juego.',
+      'Abre Steam → <b>Biblioteca</b>, clic derecho en <b>Delta Force</b> → <b>Administrar</b> → <b>Ver archivos locales</b>.',
+      'Abre la carpeta <code>Game\\DeltaForce\\Saved\\Config\\WindowsClient</code>.',
+      'Copia <code>UserSystemSettingHD.ini</code> a un lugar seguro como copia de seguridad y selecciónalo abajo.'
+    ],
+    uploadLabel: 'Selecciona o arrastra UserSystemSettingHD.ini', uploadHint: 'Solo necesitas este archivo. Nunca edites Engine.ini, Scalability.ini, DeviceProfiles.ini ni GPSystemSetting.ini.',
+    fileOk: 'Archivo leído: se escribirán {n} ajustes.', fileErr: 'Esto no parece UserSystemSettingHD.ini (no se encontró la sección de gráficos). No se cambió nada.', fileName: 'El archivo debe llamarse UserSystemSettingHD.ini.',
+    tagChg: 'cambiado', tagAdd: 'añadido', tagSame: 'igual',
+    dlssSkipped: 'Tu juego no usa Nvidia DLSS, así que la calidad de DLSS no se cambió. Elige Nvidia DLSS en el juego si lo quieres.',
+    downloadIni: 'Descargar UserSystemSettingHD.ini editado', downloadOrig: 'Descargar copia del original',
+    afterSteps: [
+      'Pon el archivo descargado en la carpeta <code>WindowsClient</code>, reemplazando el antiguo (mismo nombre).',
+      'Abre el juego y revisa Settings → GRAPHICS. <b>Graphics Preset</b> debe mostrar <b>Custom</b>.',
+      'Pulsa <kbd>S</kbd> y comprueba que <b>LocalConfig</b> sigue <b>APPLIED</b>. Si una Cloud Config sobrescribió los valores, aplica LocalConfig otra vez.'
+    ],
+    s4Title: 'Perfil del controlador NVIDIA (opcional)', s4Sub: 'Un perfil para NVIDIA Profile Inspector con ajustes del controlador para baja latencia y frametimes estables, solo para Delta Force.',
+    nvPower: 'Preferir el máximo rendimiento', nvTexQ: 'Alto rendimiento', nvAniso: 'Activado', nvLod: 'Permitir (mantiene DLSS/FSR nítidos)', nvPre: '1 (baja latencia)', nvThread: 'Activado (el juego usa DirectX 11)', nvFxaa: 'Desactivado',
+    downloadNip: 'Descargar perfil NVIDIA (.nip)',
+    nvSteps: [
+      'Descarga <b>NVIDIA Profile Inspector</b> desde <a href="{npi}" target="_blank" rel="noopener">{npiShort}</a> (Releases) y descomprímelo.',
+      'Abre <code>nvidiaProfileInspector.exe</code> y pulsa el botón <b>Import user defined profiles</b> de la barra de herramientas. Elige <code>DeltaForce_NVIDIA.nip</code>.',
+      'Si pregunta, elige <b>Merge</b>: conserva el resto del perfil oficial de NVIDIA para Delta Force.',
+      'Selecciona el perfil <b>Delta Force</b> para revisar los valores y pulsa <b>Apply changes</b>.'
+    ],
+    nvKeep: 'V-sync y G-SYNC no se tocan: el perfil oficial los mantiene como los dejó NVIDIA.',
+    nvNotNvidia: 'Elegiste una gráfica que no es NVIDIA, así que este paso no aplica.',
+    s5Title: 'Consejos extra',
+    tips: [
+      '<b>Saltar los vídeos de introducción:</b> en <code>Game\\DeltaForce\\Content\\Movies_HD</code> renombra <code>V_logo_HD.bin</code>, <code>V_logo2_HD.bin</code> y <code>V_logo2_looping_HD.bin</code> a <code>.bak</code>. Una actualización del juego puede restaurarlos.',
+      '<b>Windows:</b> Configuración → Juegos → activa el <b>Modo de juego</b>; Configuración → Sistema → Pantalla → Gráficos → activa la <b>Programación de GPU acelerada por hardware</b> (requiere reiniciar).',
+      '<b>Windows 11:</b> en la misma página de Gráficos, activa las <b>Optimizaciones para juegos en ventana</b> si juegas en Borderless Windowed.',
+      '<b>Portátiles:</b> Configuración → Sistema → Pantalla → Gráficos → añade <code>DeltaForceClient-Win64-Shipping.exe</code> y elige <b>Alto rendimiento</b>.',
+      '<b>Tirones tras actualizar el controlador:</b> usa <b>Recompile Shaders</b> (tecla <kbd>G</kbd>) en los Settings del juego.'
+    ],
+    footPrivacy: 'Privacidad: esta página no tiene servidor, ni rastreo, ni subida de archivos. Todo se ejecuta en tu navegador.',
+    footScript: '¿Prefieres automatizarlo? El <a href="{repo}">repositorio de GitHub</a> también incluye el script de código abierto para Windows que lo hace todo por ti.',
+    footCredits: 'NVIDIA Profile Inspector de Orbmu2k (<a href="{up}" target="_blank" rel="noopener">proyecto original</a>).',
+    footDisclaimer: 'Sin relación con Team Jade, TiMi Studio Group, Tencent ni NVIDIA. Delta Force es una marca de sus propietarios. Úsalo bajo tu responsabilidad.'
+  },
+  fr: {
+    _name: 'Français',
+    heroTitle: 'Optimisez Delta Force pour votre PC',
+    heroText: 'Choisissez votre matériel et obtenez les réglages graphiques recommandés, un UserSystemSettingHD.ini déjà modifié et un profil pour NVIDIA Profile Inspector. Aucun script inconnu à télécharger.',
+    badge1: '100 % dans votre navigateur', badge2: 'Vos fichiers ne quittent jamais votre PC', badge3: 'Échelles vérifiées dans le menu du jeu',
+    s1Title: 'Votre matériel', s1Sub: 'Indiquez ce que contient votre PC. Le niveau détermine les réglages recommandés.',
+    gpuVendor: 'Marque de la carte graphique', gpuSeries: 'Série de la carte graphique', vram: 'Mémoire vidéo (VRAM)', ram: 'Mémoire système (RAM)',
+    threads: 'Threads du processeur', resolution: 'Résolution de l\'écran', refresh: 'Fréquence du moniteur',
+    vendor_nvidia: 'NVIDIA', vendor_amd: 'AMD', vendor_intel: 'Intel Arc', vendor_igpu: 'Graphiques intégrés (pas de carte dédiée)',
+    detectBtn: 'Détecter automatiquement', detectNote: 'Détecte les threads du processeur, l\'écran et généralement la carte graphique. Vérifiez la VRAM et la RAM à la main.',
+    detectDone: 'Détecté : {items}. Vérifiez la VRAM et la RAM.', detectNone: 'Votre navigateur n\'a pas révélé le matériel. Choisissez-le à la main.',
+    profBalanced: 'Équilibré', profBalancedDesc: 'La meilleure qualité que votre matériel fait tourner de façon fluide.',
+    profCompetitive: 'Compétitif', profCompetitiveDesc: 'FPS et visibilité maximum. Moins d\'effets, distance d\'affichage élevée.',
+    tierLabel: 'Niveau du matériel :', tier0: 'Bas', tier1: 'Moyen', tier2: 'Élevé', tier3: 'Épique',
+    reason_vram: '(selon la VRAM)', reason_integrated: '(graphiques intégrés)', reason_older: '(limité par la génération de la carte)', reason_ramcpu: '(limité par la RAM/CPU)',
+    s2Title: 'Réglages recommandés dans le jeu', s2Sub: 'Settings > GRAPHICS. Noms tels qu\'affichés dans le jeu en anglais.',
+    colSetting: 'Réglage', colValue: 'Valeur', colBefore: 'Avant', colAfter: 'Après', colKey: 'Clé du fichier',
+    rowDisplayMode: 'Display Mode', valDisplayMode: 'Fullscreen ou Borderless Windowed', rowVsync: 'V-sync',
+    rowSRMode: 'Super Resolution Mode', rowFG: 'DLSS Frame Generation', rowDof: 'Depth of Field / Weapon Motion Blur', rowFov: 'Default FOV',
+    noHz: 'le menu ne propose pas la fréquence de votre moniteur',
+    manualNote: 'Display Mode, V-sync, Super Resolution Mode, Frame Generation, Depth of Field et FOV ne sont pas modifiés par le fichier : réglez-les dans le jeu.',
+    s3Title: 'Appliquer au fichier du jeu (facultatif)', s3Sub: 'Chargez votre UserSystemSettingHD.ini et téléchargez une copie modifiée avec les réglages ci-dessus. Rien n\'est envoyé : le fichier est traité dans votre navigateur.',
+    warnTitle: 'À lire avant de commencer',
+    warnText: 'Team Jade a averti que modifier des fichiers de configuration en dehors du jeu peut entraîner des sanctions de l\'anti-triche. Ce fichier ne fait pas partie des fichiers protégés par jeton et ne reçoit que des valeurs que le menu autorise aussi, mais cela reste une modification faite en dehors du jeu. À vos risques ; la méthode sans risque consiste à régler dans le menu les valeurs de l\'étape 2.',
+    iniSteps: [
+      'Fermez Delta Force. Avant, dans le jeu : Settings → appuyez sur <kbd>S</kbd> (Config Management) → vérifiez que <b>LocalConfig</b> est <b>APPLIED</b>, puis quittez depuis le menu du jeu.',
+      'Ouvrez Steam → <b>Bibliothèque</b>, clic droit sur <b>Delta Force</b> → <b>Gérer</b> → <b>Parcourir les fichiers locaux</b>.',
+      'Ouvrez le dossier <code>Game\\DeltaForce\\Saved\\Config\\WindowsClient</code>.',
+      'Copiez <code>UserSystemSettingHD.ini</code> en lieu sûr comme sauvegarde, puis sélectionnez-le ci-dessous.'
+    ],
+    uploadLabel: 'Sélectionnez ou déposez UserSystemSettingHD.ini', uploadHint: 'Seul ce fichier est nécessaire. Ne modifiez jamais Engine.ini, Scalability.ini, DeviceProfiles.ini ou GPSystemSetting.ini.',
+    fileOk: 'Fichier lu : {n} réglages seront écrits.', fileErr: 'Ce fichier ne ressemble pas à UserSystemSettingHD.ini (section graphique introuvable). Rien n\'a été modifié.', fileName: 'Le fichier doit s\'appeler UserSystemSettingHD.ini.',
+    tagChg: 'modifié', tagAdd: 'ajouté', tagSame: 'identique',
+    dlssSkipped: 'Votre jeu n\'utilise pas Nvidia DLSS, la qualité DLSS n\'a donc pas été modifiée. Choisissez Nvidia DLSS dans le jeu si vous le souhaitez.',
+    downloadIni: 'Télécharger UserSystemSettingHD.ini modifié', downloadOrig: 'Télécharger une copie de l\'original',
+    afterSteps: [
+      'Placez le fichier téléchargé dans le dossier <code>WindowsClient</code> en remplaçant l\'ancien (même nom).',
+      'Ouvrez le jeu et vérifiez Settings → GRAPHICS. <b>Graphics Preset</b> doit afficher <b>Custom</b>.',
+      'Appuyez sur <kbd>S</kbd> et vérifiez que <b>LocalConfig</b> est toujours <b>APPLIED</b>. Si une Cloud Config a écrasé les valeurs, appliquez de nouveau LocalConfig.'
+    ],
+    s4Title: 'Profil du pilote NVIDIA (facultatif)', s4Sub: 'Un profil pour NVIDIA Profile Inspector avec des réglages de pilote pour une faible latence et des frametimes stables, uniquement pour Delta Force.',
+    nvPower: 'Privilégier les performances maximales', nvTexQ: 'Hautes performances', nvAniso: 'Activé', nvLod: 'Autoriser (garde DLSS/FSR nets)', nvPre: '1 (faible latence)', nvThread: 'Activé (le jeu tourne en DirectX 11)', nvFxaa: 'Désactivé',
+    downloadNip: 'Télécharger le profil NVIDIA (.nip)',
+    nvSteps: [
+      'Téléchargez <b>NVIDIA Profile Inspector</b> sur <a href="{npi}" target="_blank" rel="noopener">{npiShort}</a> (Releases) et décompressez-le.',
+      'Ouvrez <code>nvidiaProfileInspector.exe</code> et cliquez sur le bouton <b>Import user defined profiles</b> de la barre d\'outils. Choisissez <code>DeltaForce_NVIDIA.nip</code>.',
+      'Si on vous le demande, choisissez <b>Merge</b> : le reste du profil officiel NVIDIA pour Delta Force est conservé.',
+      'Sélectionnez le profil <b>Delta Force</b> pour vérifier les valeurs et cliquez sur <b>Apply changes</b>.'
+    ],
+    nvKeep: 'V-sync et G-SYNC ne sont pas modifiés : le profil officiel les garde tels que NVIDIA les a réglés.',
+    nvNotNvidia: 'Vous avez choisi une carte qui n\'est pas NVIDIA, cette étape ne s\'applique donc pas.',
+    s5Title: 'Astuces supplémentaires',
+    tips: [
+      '<b>Passer les vidéos d\'introduction :</b> dans <code>Game\\DeltaForce\\Content\\Movies_HD</code>, renommez <code>V_logo_HD.bin</code>, <code>V_logo2_HD.bin</code> et <code>V_logo2_looping_HD.bin</code> en <code>.bak</code>. Une mise à jour du jeu peut les remettre.',
+      '<b>Windows :</b> Paramètres → Jeux → activez le <b>Mode Jeu</b> ; Paramètres → Système → Affichage → Graphiques → activez la <b>Planification du GPU à accélération matérielle</b> (redémarrage requis).',
+      '<b>Windows 11 :</b> sur la même page Graphiques, activez les <b>Optimisations pour les jeux fenêtrés</b> si vous jouez en Borderless Windowed.',
+      '<b>Portables :</b> Paramètres → Système → Affichage → Graphiques → ajoutez <code>DeltaForceClient-Win64-Shipping.exe</code> et choisissez <b>Performances élevées</b>.',
+      '<b>Saccades après une mise à jour du pilote :</b> utilisez <b>Recompile Shaders</b> (touche <kbd>G</kbd>) dans les Settings du jeu.'
+    ],
+    footPrivacy: 'Confidentialité : cette page n\'a ni serveur, ni pistage, ni envoi de fichiers. Tout s\'exécute dans votre navigateur.',
+    footScript: 'Vous préférez automatiser ? Le <a href="{repo}">dépôt GitHub</a> propose aussi le script Windows open source qui fait tout cela pour vous.',
+    footCredits: 'NVIDIA Profile Inspector par Orbmu2k (<a href="{up}" target="_blank" rel="noopener">projet d\'origine</a>).',
+    footDisclaimer: 'Sans lien avec Team Jade, TiMi Studio Group, Tencent ou NVIDIA. Delta Force est une marque de ses propriétaires. À vos risques.'
+  },
+  de: {
+    _name: 'Deutsch',
+    heroTitle: 'Delta Force für deinen PC optimieren',
+    heroText: 'Wähle deine Hardware und erhalte empfohlene Grafikeinstellungen, eine fertig bearbeitete UserSystemSettingHD.ini und ein Profil für NVIDIA Profile Inspector. Ganz ohne unbekannte Skripte.',
+    badge1: 'Läuft zu 100 % im Browser', badge2: 'Deine Dateien verlassen nie deinen PC', badge3: 'Skalen im Spielmenü geprüft',
+    s1Title: 'Deine Hardware', s1Sub: 'Wähle aus, was in deinem PC steckt. Die Stufe bestimmt die empfohlenen Einstellungen.',
+    gpuVendor: 'Grafikkarten-Hersteller', gpuSeries: 'Grafikkarten-Serie', vram: 'Grafikspeicher (VRAM)', ram: 'Arbeitsspeicher (RAM)',
+    threads: 'CPU-Threads', resolution: 'Bildschirmauflösung', refresh: 'Bildwiederholrate',
+    vendor_nvidia: 'NVIDIA', vendor_amd: 'AMD', vendor_intel: 'Intel Arc', vendor_igpu: 'Integrierte Grafik (keine eigene Grafikkarte)',
+    detectBtn: 'Automatisch erkennen', detectNote: 'Erkennt CPU-Threads, Bildschirm und meist die Grafikkarte. VRAM und RAM bitte selbst prüfen.',
+    detectDone: 'Erkannt: {items}. Bitte VRAM und RAM prüfen.', detectNone: 'Dein Browser hat die Hardware nicht verraten. Bitte selbst auswählen.',
+    profBalanced: 'Ausgewogen', profBalancedDesc: 'Die beste Qualität, die deine Hardware flüssig schafft.',
+    profCompetitive: 'Kompetitiv', profCompetitiveDesc: 'Maximale FPS und Sichtbarkeit. Weniger Effekte, hohe Sichtweite.',
+    tierLabel: 'Hardware-Stufe:', tier0: 'Niedrig', tier1: 'Mittel', tier2: 'Hoch', tier3: 'Episch',
+    reason_vram: '(nach VRAM)', reason_integrated: '(integrierte Grafik)', reason_older: '(begrenzt durch GPU-Generation)', reason_ramcpu: '(begrenzt durch RAM/CPU)',
+    s2Title: 'Empfohlene Einstellungen im Spiel', s2Sub: 'Settings > GRAPHICS. Namen wie im englischen Spielmenü.',
+    colSetting: 'Einstellung', colValue: 'Wert', colBefore: 'Vorher', colAfter: 'Nachher', colKey: 'Schlüssel in der Datei',
+    rowDisplayMode: 'Display Mode', valDisplayMode: 'Fullscreen oder Borderless Windowed', rowVsync: 'V-sync',
+    rowSRMode: 'Super Resolution Mode', rowFG: 'DLSS Frame Generation', rowDof: 'Depth of Field / Weapon Motion Blur', rowFov: 'Default FOV',
+    noHz: 'das Menü hat keine Option für deine Bildwiederholrate',
+    manualNote: 'Display Mode, V-sync, Super Resolution Mode, Frame Generation, Depth of Field und FOV werden nicht über die Datei geändert: Stelle sie im Spiel ein.',
+    s3Title: 'In der Spieldatei anwenden (optional)', s3Sub: 'Lade deine UserSystemSettingHD.ini und lade eine bearbeitete Kopie mit den obigen Einstellungen herunter. Es wird nichts hochgeladen: Die Datei wird in deinem Browser verarbeitet.',
+    warnTitle: 'Vor dem Start lesen',
+    warnText: 'Team Jade hat gewarnt, dass Änderungen an Konfigurationsdateien außerhalb des Spiels zu Anti-Cheat-Strafen führen können. Diese Datei gehört nicht zu den per Token geschützten Dateien und erhält nur Werte, die auch das Menü erlaubt, aber es bleibt eine Änderung außerhalb des Spiels. Nutzung auf eigenes Risiko; risikofrei ist es, die Werte aus Schritt 2 im Menü einzustellen.',
+    iniSteps: [
+      'Schließe Delta Force. Vorher im Spiel: Settings → <kbd>S</kbd> drücken (Config Management) → prüfen, dass <b>LocalConfig</b> auf <b>APPLIED</b> steht, dann über das Spielmenü beenden.',
+      'Öffne Steam → <b>Bibliothek</b>, Rechtsklick auf <b>Delta Force</b> → <b>Verwalten</b> → <b>Lokale Dateien durchsuchen</b>.',
+      'Öffne den Ordner <code>Game\\DeltaForce\\Saved\\Config\\WindowsClient</code>.',
+      'Kopiere <code>UserSystemSettingHD.ini</code> als Sicherung an einen sicheren Ort und wähle sie unten aus.'
+    ],
+    uploadLabel: 'UserSystemSettingHD.ini auswählen oder hierher ziehen', uploadHint: 'Nur diese Datei wird gebraucht. Bearbeite niemals Engine.ini, Scalability.ini, DeviceProfiles.ini oder GPSystemSetting.ini.',
+    fileOk: 'Datei gelesen: {n} Einstellungen werden geschrieben.', fileErr: 'Das sieht nicht nach UserSystemSettingHD.ini aus (Grafikabschnitt nicht gefunden). Es wurde nichts geändert.', fileName: 'Die Datei sollte UserSystemSettingHD.ini heißen.',
+    tagChg: 'geändert', tagAdd: 'hinzugefügt', tagSame: 'gleich',
+    dlssSkipped: 'Dein Spiel nutzt kein Nvidia DLSS, daher wurde die DLSS-Qualität nicht geändert. Wähle Nvidia DLSS im Spiel, wenn du es nutzen willst.',
+    downloadIni: 'Bearbeitete UserSystemSettingHD.ini herunterladen', downloadOrig: 'Sicherung des Originals herunterladen',
+    afterSteps: [
+      'Lege die heruntergeladene Datei in den Ordner <code>WindowsClient</code> und ersetze die alte (gleicher Name).',
+      'Starte das Spiel und prüfe Settings → GRAPHICS. <b>Graphics Preset</b> sollte <b>Custom</b> anzeigen.',
+      'Drücke <kbd>S</kbd> und prüfe, ob <b>LocalConfig</b> noch auf <b>APPLIED</b> steht. Falls eine Cloud Config die Werte überschrieben hat, wende LocalConfig erneut an.'
+    ],
+    s4Title: 'NVIDIA-Treiberprofil (optional)', s4Sub: 'Ein Profil für NVIDIA Profile Inspector mit Treibereinstellungen für niedrige Latenz und stabile Frametimes, nur für Delta Force.',
+    nvPower: 'Maximale Leistung bevorzugen', nvTexQ: 'Hohe Leistung', nvAniso: 'Ein', nvLod: 'Zulassen (hält DLSS/FSR scharf)', nvPre: '1 (niedrige Latenz)', nvThread: 'Ein (das Spiel läuft mit DirectX 11)', nvFxaa: 'Aus',
+    downloadNip: 'NVIDIA-Profil herunterladen (.nip)',
+    nvSteps: [
+      'Lade <b>NVIDIA Profile Inspector</b> von <a href="{npi}" target="_blank" rel="noopener">{npiShort}</a> (Releases) herunter und entpacke es.',
+      'Öffne <code>nvidiaProfileInspector.exe</code> und klicke in der Symbolleiste auf <b>Import user defined profiles</b>. Wähle <code>DeltaForce_NVIDIA.nip</code>.',
+      'Wenn gefragt, wähle <b>Merge</b>: Der Rest des offiziellen NVIDIA-Profils für Delta Force bleibt erhalten.',
+      'Wähle das Profil <b>Delta Force</b>, prüfe die Werte und klicke auf <b>Apply changes</b>.'
+    ],
+    nvKeep: 'V-sync und G-SYNC werden nicht verändert: Das offizielle Profil behält sie so, wie NVIDIA sie eingestellt hat.',
+    nvNotNvidia: 'Du hast keine NVIDIA-Grafikkarte gewählt, daher entfällt dieser Schritt.',
+    s5Title: 'Weitere Tipps',
+    tips: [
+      '<b>Intro-Videos überspringen:</b> Benenne in <code>Game\\DeltaForce\\Content\\Movies_HD</code> die Dateien <code>V_logo_HD.bin</code>, <code>V_logo2_HD.bin</code> und <code>V_logo2_looping_HD.bin</code> in <code>.bak</code> um. Ein Spielupdate kann sie zurückbringen.',
+      '<b>Windows:</b> Einstellungen → Spielen → <b>Spielmodus</b> einschalten; Einstellungen → System → Anzeige → Grafik → <b>Hardwarebeschleunigte GPU-Planung</b> einschalten (Neustart nötig).',
+      '<b>Windows 11:</b> Auf derselben Grafik-Seite die <b>Optimierungen für Spiele im Fenstermodus</b> einschalten, wenn du in Borderless Windowed spielst.',
+      '<b>Laptops:</b> Einstellungen → System → Anzeige → Grafik → <code>DeltaForceClient-Win64-Shipping.exe</code> hinzufügen und <b>Hohe Leistung</b> wählen.',
+      '<b>Ruckler nach einem Treiberupdate:</b> Nutze <b>Recompile Shaders</b> (Taste <kbd>G</kbd>) in den Settings des Spiels.'
+    ],
+    footPrivacy: 'Datenschutz: Diese Seite hat keinen Server, kein Tracking und keine Uploads. Alles läuft in deinem Browser.',
+    footScript: 'Lieber automatisch? Das <a href="{repo}">GitHub-Repository</a> enthält auch das Open-Source-Skript für Windows, das all das für dich erledigt.',
+    footCredits: 'NVIDIA Profile Inspector von Orbmu2k (<a href="{up}" target="_blank" rel="noopener">Originalprojekt</a>).',
+    footDisclaimer: 'Keine Verbindung zu Team Jade, TiMi Studio Group, Tencent oder NVIDIA. Delta Force ist eine Marke ihrer Inhaber. Nutzung auf eigenes Risiko.'
+  },
+  ru: {
+    _name: 'Русский',
+    heroTitle: 'Настройте Delta Force под свой ПК',
+    heroText: 'Укажите своё железо и получите рекомендуемые настройки графики, готовый UserSystemSettingHD.ini и профиль для NVIDIA Profile Inspector. Без скачивания непонятных скриптов.',
+    badge1: 'Работает полностью в браузере', badge2: 'Ваши файлы не покидают ПК', badge3: 'Шкалы проверены в меню игры',
+    s1Title: 'Ваше железо', s1Sub: 'Укажите, что стоит в вашем ПК. Уровень определяет рекомендуемые настройки.',
+    gpuVendor: 'Производитель видеокарты', gpuSeries: 'Серия видеокарты', vram: 'Видеопамять (VRAM)', ram: 'Оперативная память (RAM)',
+    threads: 'Потоки процессора', resolution: 'Разрешение экрана', refresh: 'Частота обновления монитора',
+    vendor_nvidia: 'NVIDIA', vendor_amd: 'AMD', vendor_intel: 'Intel Arc', vendor_igpu: 'Встроенная графика (без дискретной видеокарты)',
+    detectBtn: 'Определить автоматически', detectNote: 'Определяет потоки процессора, экран и обычно видеокарту. VRAM и RAM проверьте вручную.',
+    detectDone: 'Определено: {items}. Проверьте VRAM и RAM.', detectNone: 'Браузер не сообщил данные о железе. Выберите вручную.',
+    profBalanced: 'Сбалансированный', profBalancedDesc: 'Лучшее качество, которое ваше железо тянет плавно.',
+    profCompetitive: 'Соревновательный', profCompetitiveDesc: 'Максимум FPS и видимости. Меньше эффектов, высокая дальность прорисовки.',
+    tierLabel: 'Уровень железа:', tier0: 'Низкий', tier1: 'Средний', tier2: 'Высокий', tier3: 'Эпический',
+    reason_vram: '(по объёму VRAM)', reason_integrated: '(встроенная графика)', reason_older: '(ограничено поколением видеокарты)', reason_ramcpu: '(ограничено RAM/CPU)',
+    s2Title: 'Рекомендуемые настройки в игре', s2Sub: 'Settings > GRAPHICS. Названия как в английском меню игры.',
+    colSetting: 'Настройка', colValue: 'Значение', colBefore: 'Было', colAfter: 'Стало', colKey: 'Ключ в файле',
+    rowDisplayMode: 'Display Mode', valDisplayMode: 'Fullscreen или Borderless Windowed', rowVsync: 'V-sync',
+    rowSRMode: 'Super Resolution Mode', rowFG: 'DLSS Frame Generation', rowDof: 'Depth of Field / Weapon Motion Blur', rowFov: 'Default FOV',
+    noHz: 'в меню нет частоты вашего монитора',
+    manualNote: 'Display Mode, V-sync, Super Resolution Mode, Frame Generation, Depth of Field и FOV файлом не меняются: выставьте их в игре.',
+    s3Title: 'Применить к файлу игры (необязательно)', s3Sub: 'Загрузите свой UserSystemSettingHD.ini и скачайте изменённую копию с настройками выше. Ничего не отправляется: файл обрабатывается в вашем браузере.',
+    warnTitle: 'Прочитайте перед началом',
+    warnText: 'Team Jade предупреждала, что изменение файлов конфигурации вне игры может привести к санкциям античита. Этот файл не входит в число защищённых токеном и получает только значения, которые разрешает и меню, но это всё равно изменение вне игры. Используйте на свой риск; безопасный способ — выставить значения из шага 2 в меню.',
+    iniSteps: [
+      'Закройте Delta Force. Перед этим в игре: Settings → нажмите <kbd>S</kbd> (Config Management) → убедитесь, что <b>LocalConfig</b> в состоянии <b>APPLIED</b>, затем выйдите через меню игры.',
+      'Откройте Steam → <b>Библиотека</b>, правый клик по <b>Delta Force</b> → <b>Управление</b> → <b>Просмотреть локальные файлы</b>.',
+      'Откройте папку <code>Game\\DeltaForce\\Saved\\Config\\WindowsClient</code>.',
+      'Скопируйте <code>UserSystemSettingHD.ini</code> в надёжное место как резервную копию и выберите его ниже.'
+    ],
+    uploadLabel: 'Выберите или перетащите UserSystemSettingHD.ini', uploadHint: 'Нужен только этот файл. Никогда не редактируйте Engine.ini, Scalability.ini, DeviceProfiles.ini и GPSystemSetting.ini.',
+    fileOk: 'Файл прочитан: будет записано настроек — {n}.', fileErr: 'Это не похоже на UserSystemSettingHD.ini (раздел графики не найден). Ничего не изменено.', fileName: 'Файл должен называться UserSystemSettingHD.ini.',
+    tagChg: 'изменено', tagAdd: 'добавлено', tagSame: 'без изменений',
+    dlssSkipped: 'В игре не выбран Nvidia DLSS, поэтому качество DLSS не изменено. Выберите Nvidia DLSS в игре, если он нужен.',
+    downloadIni: 'Скачать изменённый UserSystemSettingHD.ini', downloadOrig: 'Скачать копию оригинала',
+    afterSteps: [
+      'Положите скачанный файл в папку <code>WindowsClient</code>, заменив старый (то же имя).',
+      'Запустите игру и проверьте Settings → GRAPHICS. <b>Graphics Preset</b> должен показывать <b>Custom</b>.',
+      'Нажмите <kbd>S</kbd> и убедитесь, что <b>LocalConfig</b> всё ещё <b>APPLIED</b>. Если Cloud Config перезаписала значения, снова примените LocalConfig.'
+    ],
+    s4Title: 'Профиль драйвера NVIDIA (необязательно)', s4Sub: 'Профиль для NVIDIA Profile Inspector с настройками драйвера для низкой задержки и стабильного времени кадра, только для Delta Force.',
+    nvPower: 'Предпочтителен режим максимальной производительности', nvTexQ: 'Высокая производительность', nvAniso: 'Вкл.', nvLod: 'Разрешить (DLSS/FSR остаются чёткими)', nvPre: '1 (низкая задержка)', nvThread: 'Вкл. (игра работает на DirectX 11)', nvFxaa: 'Выкл.',
+    downloadNip: 'Скачать профиль NVIDIA (.nip)',
+    nvSteps: [
+      'Скачайте <b>NVIDIA Profile Inspector</b> с <a href="{npi}" target="_blank" rel="noopener">{npiShort}</a> (Releases) и распакуйте.',
+      'Откройте <code>nvidiaProfileInspector.exe</code> и нажмите на панели инструментов кнопку <b>Import user defined profiles</b>. Выберите <code>DeltaForce_NVIDIA.nip</code>.',
+      'Если появится вопрос, выберите <b>Merge</b>: остальная часть официального профиля NVIDIA для Delta Force сохранится.',
+      'Выберите профиль <b>Delta Force</b>, проверьте значения и нажмите <b>Apply changes</b>.'
+    ],
+    nvKeep: 'V-sync и G-SYNC не трогаются: официальный профиль оставляет их такими, как их настроила NVIDIA.',
+    nvNotNvidia: 'Вы выбрали видеокарту не NVIDIA, поэтому этот шаг не нужен.',
+    s5Title: 'Дополнительные советы',
+    tips: [
+      '<b>Пропуск вступительных роликов:</b> в <code>Game\\DeltaForce\\Content\\Movies_HD</code> переименуйте <code>V_logo_HD.bin</code>, <code>V_logo2_HD.bin</code> и <code>V_logo2_looping_HD.bin</code> в <code>.bak</code>. Обновление игры может вернуть их.',
+      '<b>Windows:</b> Параметры → Игры → включите <b>Игровой режим</b>; Параметры → Система → Дисплей → Графика → включите <b>Планирование графического процессора с аппаратным ускорением</b> (нужна перезагрузка).',
+      '<b>Windows 11:</b> на той же странице «Графика» включите <b>Оптимизации для игр в оконном режиме</b>, если играете в Borderless Windowed.',
+      '<b>Ноутбуки:</b> Параметры → Система → Дисплей → Графика → добавьте <code>DeltaForceClient-Win64-Shipping.exe</code> и выберите <b>Высокая производительность</b>.',
+      '<b>Фризы после обновления драйвера:</b> используйте <b>Recompile Shaders</b> (клавиша <kbd>G</kbd>) в Settings игры.'
+    ],
+    footPrivacy: 'Конфиденциальность: у этой страницы нет сервера, отслеживания и загрузки файлов. Всё работает в вашем браузере.',
+    footScript: 'Хотите автоматизировать? В <a href="{repo}">репозитории GitHub</a> есть и скрипт для Windows с открытым кодом, который сделает всё это за вас.',
+    footCredits: 'NVIDIA Profile Inspector от Orbmu2k (<a href="{up}" target="_blank" rel="noopener">оригинальный проект</a>).',
+    footDisclaimer: 'Не связано с Team Jade, TiMi Studio Group, Tencent или NVIDIA. Delta Force — торговая марка её владельцев. Используйте на свой риск.'
+  }
+};
+</script>
+
+<script>
+/* ---------------- UI ---------------- */
+(() => {
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } }
+  };
+  let lang = 'en';
+  let loaded = null; // { name, buf, dec }
+
+  function t(key) { const d = I18N[lang] || I18N.en; return (key in d) ? d[key] : I18N.en[key]; }
+  function fill(s) {
+    return String(s).replace('{npi}', NPI_URL).replace('{npiShort}', NPI_URL.replace('https://', ''))
+      .replace('{repo}', REPO_URL).replace('{up}', NPI_UPSTREAM);
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  // ----- selects -----
+  function opt(sel, items, value) {
+    sel.innerHTML = items.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join('');
+    if (value !== undefined && items.some(i => String(i[0]) === String(value))) sel.value = String(value);
+  }
+  function fillVendor(keep) {
+    opt($('vendor'), ['nvidia', 'amd', 'intel', 'igpu'].map(v => [v, t('vendor_' + v)]), keep || $('vendor').value || 'nvidia');
+  }
+  function fillSeries(keep) {
+    const v = $('vendor').value;
+    opt($('series'), Core.SERIES[v].map(s => [s[0], s[1]]), keep);
+  }
+  function initStatic() {
+    opt($('vram'), [2, 3, 4, 6, 8, 10, 11, 12, 16, 20, 24, 32].map(v => [v, v + ' GB']), 8);
+    opt($('ram'), [8, 12, 16, 24, 32, 48, 64, 96, 128].map(v => [v, v + ' GB']), 16);
+    opt($('threads'), [4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32].map(v => [v, String(v)]), 12);
+    opt($('res'), [['1280x720', '1280 × 720'], ['1366x768', '1366 × 768'], ['1600x900', '1600 × 900'], ['1920x1080', '1920 × 1080 (Full HD)'], ['2560x1080', '2560 × 1080'], ['2560x1440', '2560 × 1440 (QHD)'], ['3440x1440', '3440 × 1440'], ['3840x2160', '3840 × 2160 (4K)']], '1920x1080');
+    opt($('hz'), [60, 75, 100, 120, 144, 165, 170, 180, 240, 280, 360].map(v => [v, v + ' Hz']), 144);
+  }
+
+  function hw() {
+    return {
+      vendor: $('vendor').value, series: $('series').value,
+      vram: +$('vram').value, ram: +$('ram').value, threads: +$('threads').value,
+      res: $('res').value, hz: +$('hz').value
+    };
+  }
+  function mode() { return document.querySelector('input[name=profile]:checked').value; }
+
+  // ----- render -----
+  function render() {
+    const h = hw();
+    const { items, tier } = Core.profile(h, mode());
+    $('tierName').textContent = t('tier' + tier.tier);
+    $('tierReason').textContent = t('reason_' + tier.reason);
+
+    // recommended table
+    const rows = [];
+    rows.push([t('rowDisplayMode'), t('valDisplayMode')]);
+    rows.push([t('rowVsync'), 'Off']);
+    rows.push([t('resolution'), h.res.replace('x', ' × ')]);
+    for (const e of items) {
+      let v = Core.valueName(e);
+      if (e[0] === 'MaxFPS' && e[5] === 'noHz') v += ' (' + t('noHz') + ')';
+      rows.push([e[1], v]);
+    }
+    rows.push([t('rowSRMode'), Core.upscaler(tier.kind)]);
+    rows.push([t('rowFG'), 'Off']);
+    rows.push([t('rowDof'), 'Off']);
+    rows.push([t('rowFov'), mode() === 'Competitive' ? '105 – 120' : '90 – 105']);
+    $('recTable').tBodies[0].innerHTML = rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('');
+
+    // NVIDIA
+    const isNv = h.vendor === 'nvidia';
+    $('nvBlock').classList.toggle('hidden', !isNv);
+    $('nvNo').classList.toggle('hidden', isNv);
+    $('nvTable').tBodies[0].innerHTML = Core.NV_SETTINGS.map(s => `<tr><td>${esc(s[0])}</td><td>${esc(t(s[3]))}</td></tr>`).join('');
+
+    if (loaded) processIni();
+  }
+
+  function renderTexts() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i]').forEach(el => { el.innerHTML = fill(t(el.dataset.i)); });
+    $('iniSteps').innerHTML = t('iniSteps').map(s => `<li>${fill(s)}</li>`).join('');
+    $('afterSteps').innerHTML = t('afterSteps').map(s => `<li>${fill(s)}</li>`).join('');
+    $('nvSteps').innerHTML = t('nvSteps').map(s => `<li>${fill(s)}</li>`).join('');
+    $('tips').innerHTML = t('tips').map(s => `<li>${fill(s)}</li>`).join('');
+    const vk = $('vendor').value, sk = $('series').value;
+    fillVendor(vk); fillSeries(sk);
+    render();
+  }
+
+  // ----- INI -----
+  function processIni() {
+    const st = $('fileStatus');
+    const { items } = Core.profile(hw(), mode());
+    const res = Core.applyIni(loaded.dec.text, items);
+    if (!res.ok) {
+      st.className = 'status err'; st.textContent = t('fileErr');
+      $('iniResult').classList.add('hidden');
+      loaded.out = null;
+      return;
+    }
+    let msg = t('fileOk').replace('{n}', res.changes.length);
+    if (!/^UserSystemSettingHD\.ini$/i.test(loaded.name)) msg += ' ' + t('fileName');
+    st.className = 'status ok'; st.textContent = msg;
+    const tagMap = { chg: ['chg', t('tagChg')], add: ['add', t('tagAdd')], same: ['same', t('tagSame')] };
+    $('chgTable').tBodies[0].innerHTML = res.changes.map(c => {
+      const before = c.old === null ? '—' : esc(c.old);
+      const tg = tagMap[c.status];
+      return `<tr><td>${esc(c.e[1])} <span class="tag ${tg[0]}">${esc(tg[1])}</span></td><td>${before}</td><td><code>${esc(c.key)}</code></td><td>${esc(String(c.e[2]))} · ${esc(Core.valueName(c.e))}</td></tr>`;
+    }).join('');
+    $('dlssNote').textContent = res.dlssSkipped ? t('dlssSkipped') : '';
+    $('iniResult').classList.remove('hidden');
+    loaded.out = Core.encode(res.text, loaded.dec.enc);
+  }
+
+  function readFile(f) {
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { loaded = { name: f.name, buf: r.result, dec: Core.decode(r.result) }; processIni(); };
+    r.readAsArrayBuffer(f);
+  }
+
+  function download(name, data, type) {
+    const blob = new Blob([data], { type: type || 'application/octet-stream' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  // ----- detection -----
+  function measureHz() {
+    return new Promise(resolve => {
+      const ts = []; let n = 0;
+      function f(t0) { ts.push(t0); if (++n < 70) requestAnimationFrame(f); else {
+        const d = []; for (let i = 10; i < ts.length; i++) d.push(ts[i] - ts[i - 1]);
+        d.sort((a, b) => a - b); const med = d[Math.floor(d.length / 2)];
+        resolve(med > 0 ? 1000 / med : 0);
+      } }
+      requestAnimationFrame(f);
+    });
+  }
+  function nearest(list, v) { return list.reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a); }
+
+  async function detect() {
+    const found = [];
+    const th = navigator.hardwareConcurrency;
+    if (th) { $('threads').value = String(nearest([4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32], th)); found.push(th + ' threads'); }
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(screen.width * dpr), hgt = Math.round(screen.height * dpr);
+    const resList = [...$('res').options].map(o => o.value);
+    const exact = resList.find(r => r === w + 'x' + hgt);
+    if (exact) { $('res').value = exact; found.push(w + '×' + hgt); }
+    try {
+      const gl = document.createElement('canvas').getContext('webgl');
+      const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+      const ren = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : '';
+      const g = Core.parseRenderer(ren);
+      if (g) {
+        $('vendor').value = g.vendor; fillSeries(g.series);
+        const m = ren.match(/(GeForce|Radeon|Arc|Intel)[^(),]*/i);
+        found.push(m ? m[0].trim() : g.series);
+      }
+    } catch (e) { /* WebGL unavailable */ }
+    const hz = await measureHz();
+    if (hz > 30) { const n = nearest([60, 75, 100, 120, 144, 165, 170, 180, 240, 280, 360], hz); $('hz').value = String(n); found.push(n + ' Hz'); }
+    $('detectMsg').textContent = found.length ? t('detectDone').replace('{items}', found.join(', ')) : t('detectNone');
+    render();
+  }
+
+  // ----- init -----
+  $('ver').textContent = 'v' + VERSION;
+  $('lang').innerHTML = Object.keys(I18N).map(k => `<option value="${k}">${I18N[k]._name}</option>`).join('');
+  const saved = store.get('dft_lang');
+  const nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  lang = (saved && I18N[saved]) ? saved : (I18N[nav] ? nav : 'en');
+  $('lang').value = lang;
+  initStatic();
+  fillVendor('nvidia'); fillSeries('rtx30');
+  renderTexts();
+
+  $('lang').addEventListener('change', e => { lang = e.target.value; store.set('dft_lang', lang); renderTexts(); });
+  $('vendor').addEventListener('change', () => { fillSeries(); render(); });
+  ['series', 'vram', 'ram', 'threads', 'res', 'hz'].forEach(id => $(id).addEventListener('change', render));
+  document.querySelectorAll('input[name=profile]').forEach(r => r.addEventListener('change', render));
+  $('detect').addEventListener('click', detect);
+  $('file').addEventListener('change', e => readFile(e.target.files[0]));
+  const drop = $('drop');
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => readFile(e.dataTransfer.files[0]));
+  $('dlIni').addEventListener('click', () => { if (loaded && loaded.out) download('UserSystemSettingHD.ini', loaded.out); });
+  $('dlOrig').addEventListener('click', () => { if (loaded) download('UserSystemSettingHD.ini.backup', loaded.buf); });
+  $('dlNip').addEventListener('click', () => download('DeltaForce_NVIDIA.nip', '﻿' + Core.buildNip(), 'application/xml'));
+})();
+</script>
+</body>
+</html>
