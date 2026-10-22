@@ -1,0 +1,10 @@
+# Batch files are stored byte-for-byte with Windows (CRLF) line endings, so raw
+# downloads from GitHub also keep CRLF (cmd.exe can misread LF-only files)
+*.cmd   -text
+*.bat   -text
+
+# Everything else: normalize to LF in the repository
+*.html  text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+LICENSE text eol=lf

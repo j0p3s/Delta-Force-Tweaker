@@ -1,0 +1,29 @@
+name: Hardware / settings report
+description: Confirm the tools on your PC, or report a menu value that does not match
+labels: [hardware-report]
+body:
+  - type: input
+    id: hardware
+    attributes:
+      label: GPU, VRAM, CPU, RAM, resolution and refresh rate
+    validations:
+      required: true
+  - type: input
+    id: game
+    attributes:
+      label: Game version
+      description: Shown in the game's launcher or settings.
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - Everything matched the in-game menu
+        - Some values did not match (details below)
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Which setting, what the file says and what the menu shows. Screenshots of the menu are very helpful.

@@ -1,0 +1,44 @@
+name: Bug report
+description: Something did not work as expected
+labels: [bug]
+body:
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool?
+      options:
+        - Web app
+        - Windows script (.cmd)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown in the page header or the script window title.
+      placeholder: 1.0.0-beta
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 24H2 (build 26100)
+  - type: input
+    id: hardware
+    attributes:
+      label: GPU, VRAM, CPU, RAM
+      placeholder: RTX 3080 Laptop 16 GB, i7-11800H, 32 GB
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected and what happened instead. Paste the script output if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: ini
+    attributes:
+      label: Graphics section of UserSystemSettingHD.ini (optional)
+      description: The lines under [/Script/GPGlobalDefines.ClientVideoSettingHD]. Do not paste other sections.
+      render: ini

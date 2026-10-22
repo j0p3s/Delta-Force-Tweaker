@@ -9,9 +9,9 @@ MINOR for new features, PATCH for fixes.
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-10-22
+## [1.0.0-beta] - 2026-10-22
 
-First public release.
+First public beta. Tested on one PC (Windows 10 22H2, RTX 3080 Laptop, game version 1.102.37117); reports from other hardware are welcome.
 
 ### Added
 - Hardware detection: CPU, RAM, GPU (real VRAM read from the registry), resolution and refresh rate, with a hardware tier (Low / Medium / High / Epic).
@@ -26,7 +26,9 @@ First public release.
 - NVIDIA driver profile via NVIDIA Profile Inspector (**[5]**, **[6]**, **[7]**): automatic download, backup of customized profiles, merge into the official "Delta Force" profile, verification of every setting, restore to the original state, and high-performance GPU selection on laptops with an integrated GPU.
 - Windows 10/11 gaming settings (**[G]**): Game Mode, Hardware-accelerated GPU scheduling, background recording (Game Bar), optimizations for windowed games (Windows 11 22H2+) and power plan.
 - Start without UAC prompt through a scheduled task (**[A]** / **[R]**).
-- Version number in the file name, window title, menu, reports and scheduled task description.
+- Web app (`index.html`, GitHub Pages) in English, Portuguese, Spanish, French, German and Russian: hardware selection with browser auto-detection, recommended settings, in-browser editing of `UserSystemSettingHD.ini` (nothing is uploaded) and a downloadable NVIDIA Profile Inspector profile.
+- NVIDIA Profile Inspector download from the project's fork, with fallback to the original project.
+- Version number in the file name, window title, menu, reports, web app and scheduled task description.
 
-[Unreleased]: https://github.com/j0p3s/Delta-Force-Tweaker/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/j0p3s/Delta-Force-Tweaker/releases/tag/v1.0.0
+[Unreleased]: https://github.com/j0p3s/Delta-Force-Tweaker/compare/v1.0.0-beta...HEAD
+[1.0.0-beta]: https://github.com/j0p3s/Delta-Force-Tweaker/releases/tag/v1.0.0-beta
