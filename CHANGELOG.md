@@ -9,6 +9,11 @@ MINOR for new features, PATCH for fixes.
 
 ## [Unreleased]
 
+## [1.1.0-beta] - 2026-10-28
+
+### Added
+- **Potato shadows** switch: sets Shadows and Shadow Map to Low in any profile, for the biggest FPS gain on weak GPUs and laptops while keeping the rest of the Balanced profile. Web app: checkbox under the profiles (all six languages). Windows script: menu option **[P]**. It only uses Low, the lowest value the in-game menu allows.
+
 ## [1.0.0-beta] - 2026-10-22
 
 First public beta. Tested on one PC (Windows 10 22H2, RTX 3080 Laptop, game version 1.102.37117); reports from other hardware are welcome.
@@ -30,5 +35,6 @@ First public beta. Tested on one PC (Windows 10 22H2, RTX 3080 Laptop, game vers
 - NVIDIA Profile Inspector download from the project's fork, with fallback to the original project.
 - Version number in the file name, window title, menu, reports, web app and scheduled task description.
 
-[Unreleased]: https://github.com/j0p3s/Delta-Force-Tweaker/compare/v1.0.0-beta...HEAD
+[Unreleased]: https://github.com/j0p3s/Delta-Force-Tweaker/compare/v1.1.0-beta...HEAD
+[1.1.0-beta]: https://github.com/j0p3s/Delta-Force-Tweaker/releases/tag/v1.1.0-beta
 [1.0.0-beta]: https://github.com/j0p3s/Delta-Force-Tweaker/releases/tag/v1.0.0-beta

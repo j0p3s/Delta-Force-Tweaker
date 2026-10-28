@@ -4,7 +4,7 @@
 
 **Hardware-aware graphics settings, a ready-to-use config file and a tuned NVIDIA driver profile for Delta Force.**
 
-[![Version](https://img.shields.io/badge/version-1.0.0--beta-orange)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.0--beta-orange)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-blue)](#requirements)
 [![Web app](https://img.shields.io/badge/web%20app-open-22c55e)](https://j0p3s.github.io/Delta-Force-Tweaker/)
@@ -16,7 +16,7 @@
 ---
 
 > [!NOTE]
-> **Beta release.** Version 1.0.0-beta has been tested on one PC (Windows 10 22H2, RTX 3080 Laptop, game version 1.102.37117). Please [report issues](../../issues) with your hardware and Windows version so it can be verified on more systems.
+> **Beta release.** Version 1.1.0-beta. The 1.0.0-beta base was tested on one PC (Windows 10 22H2, RTX 3080 Laptop, game version 1.102.37117). Please [report issues](../../issues) with your hardware and Windows version so it can be verified on more systems.
 
 ## Table of contents
 
@@ -38,6 +38,7 @@
 |---|:---:|:---:|
 | Detects your hardware and picks a tier (Low / Medium / High / Epic) | ✅ | ✅ |
 | Recommended in-game settings: **Balanced** or **Competitive** | ✅ | ✅ |
+| **Potato shadows** switch: Shadows + Shadow Map at Low in any profile | ✅ | ✅ |
 | Writes those settings to `UserSystemSettingHD.ini` (with backup) | ✅ download | ✅ in place |
 | NVIDIA Profile Inspector profile (`.nip`) for Delta Force only | ✅ download | ✅ applied and verified |
 | Finds the game folder (Steam, launcher, registry, all drives) | — | ✅ |
@@ -53,7 +54,7 @@
 
 Everything runs locally in your browser. There is no server, no tracking and no upload: your file is read and edited on your own PC.
 
-1. **Choose your hardware** (or click *Detect automatically* and then check VRAM and RAM) and a profile.
+1. **Choose your hardware** (or click *Detect automatically* and then check VRAM and RAM) and a profile. Tick **Potato shadows** for the biggest FPS gain on weak GPUs and laptops.
 2. **Read the recommended settings.** You can simply set them in the game menu, which is the risk-free way.
 3. **Optional, edit the config file:**
    1. In the game: *Settings* → press <kbd>S</kbd> (*Config Management*) → make sure **LocalConfig** is **APPLIED**, then exit from the game menu.
@@ -74,7 +75,7 @@ For people who want everything done automatically.
 
 ### Run it
 
-1. Download `Delta-Force-Tweaker_v1.0.0-beta.cmd` from [Releases](../../releases).
+1. Download `Delta-Force-Tweaker_v1.1.0-beta.cmd` from [Releases](../../releases).
 2. Close Delta Force.
 3. Double-click the file. Windows may show *"Windows protected your PC"* because the file is new and unsigned: click *More info* → *Run anyway*. The script is plain text, so you can open it in Notepad and read every line first.
 4. Accept the UAC prompt **once**. The script creates a scheduled task called **Delta Force Tweaker** so later runs open as administrator without asking again. Remove it any time with option **[R]**.
@@ -84,6 +85,7 @@ For people who want everything done automatically.
 | Key | Action |
 |---|---|
 | `1` / `2` | Show and save recommended settings (Balanced / Competitive) |
+| `P` | Potato shadows on/off (Shadows + Shadow Map at Low in any profile) |
 | `W` | Write the settings to `UserSystemSettingHD.ini` (warning, `YES` confirmation, automatic backup) |
 | `3` | Clear the game's shader cache |
 | `V` | Skip / restore the intro videos |

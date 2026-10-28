@@ -1,15 +1,17 @@
 @echo off
 setlocal EnableExtensions
-set "VERSION=1.0.0-beta"
+set "VERSION=1.1.0-beta"
 title Delta Force Tweaker v%VERSION%
 
 :: ------------------------------------------------------------------
-::  Delta Force Tweaker v1.0.0-beta
+::  Delta Force Tweaker v1.1.0-beta
 ::  https://github.com/j0p3s/Delta-Force-Tweaker
 ::
 ::  - Detects CPU, RAM, GPU (VRAM), resolution and refresh rate
 ::  - Shows and saves (.txt) recommended in-game settings for your
 ::    hardware (Balanced or Competitive profile)
+::  - Option [P]: "Potato shadows" switch (Shadows + Shadow Map at Low
+::    in any profile)
 ::  - Option [W] (optional, with warning): writes those values to
 ::    UserSystemSettingHD.ini, after a backup. Value scales were
 ::    confirmed against the in-game menu. Never touches the token-
@@ -64,7 +66,7 @@ pause
 exit /b 0
 
 ::__PS_BEGIN__
-param([string]$Here = (Get-Location).Path, [string]$Self = '', [string]$Version = '1.0.0-beta')
+param([string]$Here = (Get-Location).Path, [string]$Self = '', [string]$Version = '1.1.0-beta')
 $Here = [IO.Path]::GetFullPath($Here)
 $ErrorActionPreference = 'SilentlyContinue'
 $Host.UI.RawUI.WindowTitle = "Delta Force Tweaker v$Version"
@@ -182,20 +184,24 @@ function Get-FpsIndex($target) {
     return @{ Idx = $FpsMap[$best]; Txt = "$best" }
 }
 
+# "Potato shadows" switch (menu option P): Shadows and Shadow Map at Low in any profile.
+# Low is the lowest value the game menu allows; nothing below it is written.
+$script:potato = $false
+
 # Values (file indices) for each profile, based on the hardware tier
 function Get-DFProfile($mode) {
-    $t = [math]::Min($tier, 3); $c = ($mode -eq 'Competitive')
+    $t = [math]::Min($tier, 3); $c = ($mode -eq 'Competitive'); $po = [bool]$script:potato
     $p = [ordered]@{}
     #   key in the file                       name in the menu           value                                                        scale
     $p['TextureQuality']          = @('Textures',            $tex,                                                        'Q')
     $p['GraphicsPreset']          = @('Graphics Preset',     0,                                                           'PRE')
-    $p['ShadowQuality']           = @('Shadows',             $(if ($c) { 0 } else { [math]::Min($t, 2) }),                'Q')
+    $p['ShadowQuality']           = @('Shadows',             $(if ($c -or $po) { 0 } else { [math]::Min($t, 2) }),        'Q')
     $p['ViewDistanceLevel']       = @('Scene View Distance', $(if ($c) { [math]::Max([math]::Min($t, 2), 1) } else { $t }), 'Q')
     $p['TextureFilteringQuality'] = @('Texture Filtering',   [math]::Min([math]::Max($t, 2), 3),                          'Q')
     $p['StreamingQuality']        = @('Streaming',           $(if ($c) { [math]::Min($t, 1) } else { [math]::Min($t, 2) }), 'Q')
     $p['SceneDetailLevel']        = @('Scene Details',       $(if ($c) { 0 } else { $t }),                                'Q')
     $p['ShadingQuality']          = @('Shaders',             $(if ($c) { 0 } else { [math]::Min($t, 2) }),                'Q')
-    $p['ShadowMapResolution']     = @('Shadow Map',          $(if ($c) { 0 } else { [math]::Min($t, 2) }),                'Q')
+    $p['ShadowMapResolution']     = @('Shadow Map',          $(if ($c -or $po) { 0 } else { [math]::Min($t, 2) }),        'Q')
     $p['GIQuality']               = @('Lumen (GI)',          $(if (-not $c -and $t -ge 3) { 3 } else { 0 }),              'Q')
     $p['ReflectionQuality']       = @('Reflections',         $(if ($c) { 0 } else { [math]::Max($t - 1, 0) }),            'Q')
     $p['AmbientOcclusionQuality'] = @('Ambient Occlusion',   $(if (-not $c -and $t -ge 2) { 2 } else { 0 }),              'AO')
@@ -238,6 +244,7 @@ function Show-Recommendations($mode) {
     $out.Add("GPU:        $gpuName ($vramGB GB VRAM)")
     $out.Add("Monitor:    ${resX}x${resY} @ ${hz} Hz")
     $out.Add("Tier:       $($Q[$tier]) ($reason)")
+    $out.Add("Potato shadows: $(if ($script:potato) { 'On (Shadows + Shadow Map at Low)' } else { 'Off' })")
     $out.Add('')
     $out.Add('Settings > GRAPHICS (names as shown in the game):')
     $out.Add('  Display Mode'.PadRight(42, '.') + ' Fullscreen or Borderless Windowed')
@@ -273,6 +280,7 @@ function Write-DFSettings {
     Write-Host '  [1] Balanced   [2] Competitive'
     $m = Read-Host 'Profile (Enter to cancel)'
     $mode = if ($m -eq '1') { 'Balanced' } elseif ($m -eq '2') { 'Competitive' } else { return }
+    if ($script:potato) { Write-Host 'Potato shadows is ON: Shadows and Shadow Map will be set to Low.' -ForegroundColor Cyan }
 
     Write-Host ''
     Write-Host '!!! WARNING !!!' -ForegroundColor Yellow
@@ -1019,6 +1027,7 @@ while ($true) {
     Write-Host '------------------------------------------------------------------'
     Write-Host "  [1] Recommended settings - Balanced (quality/performance)"
     Write-Host "  [2] Recommended settings - Competitive (maximum FPS)"
+    Write-Host ("  [P] Potato shadows (Shadows + Shadow Map at Low) ... " + $(if ($script:potato) { 'ON' } else { 'off' }))
     Write-Host "  [W] Write the settings to the game file (with warning and backup)"
     Write-Host "  [3] Clear the game's shader cache"
     $iv = Get-IntroState
@@ -1046,6 +1055,7 @@ while ($true) {
     switch ($op) {
         '1' { Show-Recommendations 'Balanced'; Read-Host "`nEnter to continue" | Out-Null }
         '2' { Show-Recommendations 'Competitive'; Read-Host "`nEnter to continue" | Out-Null }
+        'P' { $script:potato = -not $script:potato }
         'W' { Write-DFSettings; Read-Host "`nEnter to continue" | Out-Null }
         'C' { $script:gameDirsCache = $null; $null = Test-DFInstall; Show-LocalConfigHelp; Read-Host "`nEnter to continue" | Out-Null }
         '3' { Clear-ShaderCache; Read-Host "`nEnter to continue" | Out-Null }

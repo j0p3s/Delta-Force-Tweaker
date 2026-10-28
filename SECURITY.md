@@ -10,7 +10,7 @@
 Release notes list the SHA-256 hash of the script. In PowerShell:
 
 ```powershell
-Get-FileHash .\Delta-Force-Tweaker_v1.0.0-beta.cmd -Algorithm SHA256
+Get-FileHash .\Delta-Force-Tweaker_v1.1.0-beta.cmd -Algorithm SHA256
 ```
 
 Only download the script from this repository's [Releases](https://github.com/j0p3s/Delta-Force-Tweaker/releases) page.

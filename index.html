@@ -64,6 +64,11 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:.9rem;font-weight:6
 .seg label:has(input:checked){border-color:var(--accent);background:var(--surface2)}
 .seg b{display:block}
 .seg span{font-size:.85rem;color:var(--muted)}
+.switch{display:flex;gap:10px;align-items:flex-start;margin-top:10px;border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;background:var(--surface)}
+.switch input{margin-top:4px;accent-color:var(--accent);width:18px;height:18px;flex:none}
+.switch:has(input:checked){border-color:var(--accent);background:var(--surface2)}
+.switch b{display:block}
+.switch span{font-size:.85rem;color:var(--muted)}
 .tier{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
 .tier strong{color:var(--accent);font-size:1.1rem}
 .tbl{width:100%;border-collapse:collapse;font-size:.93rem}
@@ -138,6 +143,7 @@ footer p{margin:6px 0}
       <label><input type="radio" name="profile" value="Balanced" checked><div><b data-i="profBalanced"></b><span data-i="profBalancedDesc"></span></div></label>
       <label><input type="radio" name="profile" value="Competitive"><div><b data-i="profCompetitive"></b><span data-i="profCompetitiveDesc"></span></div></label>
     </div>
+    <label class="switch"><input type="checkbox" id="potato"><div><b data-i="potatoLabel"></b><span data-i="potatoDesc"></span></div></label>
     <div class="tier"><span data-i="tierLabel"></span> <strong id="tierName"></strong> <span class="muted" id="tierReason"></span></div>
   </section>
 
@@ -206,7 +212,7 @@ footer p{margin:6px 0}
    Delta Force Tweaker - web version
    Version is shared with the .cmd script and CHANGELOG.md.
    ==================================================================== */
-const VERSION = '1.0.0-beta';
+const VERSION = '1.1.0-beta';
 const REPO_URL = 'https://github.com/j0p3s/Delta-Force-Tweaker';
 const NPI_URL  = 'https://github.com/j0p3s/nvidiaProfileInspector';
 const NPI_UPSTREAM = 'https://github.com/Orbmu2k/nvidiaProfileInspector';
@@ -279,20 +285,22 @@ const Core = (() => {
   }
 
   // Ordered list of [iniKey, menuName, value, scale, text?]
-  function profile(hw, mode) {
+  // potato = "Potato shadows" switch: Shadows and Shadow Map at Low (the lowest value the menu
+  // allows) in any profile. Values below Low are not used: the game menu does not offer them.
+  function profile(hw, mode, potato) {
     const r = computeTier(hw);
-    const t = Math.min(r.tier, 3), c = mode === 'Competitive';
+    const t = Math.min(r.tier, 3), c = mode === 'Competitive', po = !!potato;
     const min = Math.min, max = Math.max;
     const p = [
       ['TextureQuality', 'Textures', r.tex, 'Q'],
       ['GraphicsPreset', 'Graphics Preset', 0, 'PRE'],
-      ['ShadowQuality', 'Shadows', c ? 0 : min(t, 2), 'Q'],
+      ['ShadowQuality', 'Shadows', (c || po) ? 0 : min(t, 2), 'Q'],
       ['ViewDistanceLevel', 'Scene View Distance', c ? max(min(t, 2), 1) : t, 'Q'],
       ['TextureFilteringQuality', 'Texture Filtering', min(max(t, 2), 3), 'Q'],
       ['StreamingQuality', 'Streaming', c ? min(t, 1) : min(t, 2), 'Q'],
       ['SceneDetailLevel', 'Scene Details', c ? 0 : t, 'Q'],
       ['ShadingQuality', 'Shaders', c ? 0 : min(t, 2), 'Q'],
-      ['ShadowMapResolution', 'Shadow Map', c ? 0 : min(t, 2), 'Q'],
+      ['ShadowMapResolution', 'Shadow Map', (c || po) ? 0 : min(t, 2), 'Q'],
       ['GIQuality', 'Lumen (GI)', (!c && t >= 3) ? 3 : 0, 'Q'],
       ['ReflectionQuality', 'Reflections', c ? 0 : max(t - 1, 0), 'Q'],
       ['AmbientOcclusionQuality', 'Ambient Occlusion', (!c && t >= 2) ? 2 : 0, 'AO'],
@@ -452,6 +460,7 @@ const I18N = {
     detectDone: 'Detected: {items}. Please check VRAM and RAM.', detectNone: 'Your browser did not reveal the hardware. Please choose it by hand.',
     profBalanced: 'Balanced', profBalancedDesc: 'Best quality your hardware can run smoothly.',
     profCompetitive: 'Competitive', profCompetitiveDesc: 'Maximum FPS and visibility. Lower effects, high view distance.',
+    potatoLabel: 'Potato shadows', potatoDesc: 'Shadows and Shadow Map at Low in any profile. The biggest FPS gain on weak GPUs and laptops; shadows look blocky.',
     tierLabel: 'Hardware tier:', tier0: 'Low', tier1: 'Medium', tier2: 'High', tier3: 'Epic',
     reason_vram: '(based on VRAM)', reason_integrated: '(integrated GPU)', reason_older: '(limited by GPU generation)', reason_ramcpu: '(limited by RAM/CPU)',
     s2Title: 'Recommended in-game settings', s2Sub: 'Settings > GRAPHICS. Names as shown in the game in English.',
@@ -516,6 +525,7 @@ const I18N = {
     detectDone: 'Detetado: {items}. Confirma a VRAM e a RAM.', detectNone: 'O navegador não revelou o hardware. Escolhe-o à mão.',
     profBalanced: 'Equilibrado', profBalancedDesc: 'A melhor qualidade que o teu hardware aguenta com fluidez.',
     profCompetitive: 'Competitivo', profCompetitiveDesc: 'Máximo de FPS e visibilidade. Menos efeitos, distância de visão alta.',
+    potatoLabel: 'Sombras batata', potatoDesc: 'Shadows e Shadow Map em Low em qualquer perfil. O maior ganho de FPS em placas fracas e portáteis; as sombras ficam mais grosseiras.',
     tierLabel: 'Nível do hardware:', tier0: 'Baixo', tier1: 'Médio', tier2: 'Alto', tier3: 'Épico',
     reason_vram: '(pela VRAM)', reason_integrated: '(gráfica integrada)', reason_older: '(limitado pela geração da placa)', reason_ramcpu: '(limitado pela RAM/CPU)',
     s2Title: 'Definições recomendadas no jogo', s2Sub: 'Settings > GRAPHICS. Nomes como aparecem no jogo em inglês.',
@@ -580,6 +590,7 @@ const I18N = {
     detectDone: 'Detectado: {items}. Comprueba la VRAM y la RAM.', detectNone: 'Tu navegador no mostró el hardware. Elígelo a mano.',
     profBalanced: 'Equilibrado', profBalancedDesc: 'La mejor calidad que tu hardware mueve con fluidez.',
     profCompetitive: 'Competitivo', profCompetitiveDesc: 'Máximo de FPS y visibilidad. Menos efectos, distancia de visión alta.',
+    potatoLabel: 'Sombras patata', potatoDesc: 'Shadows y Shadow Map en Low en cualquier perfil. La mayor ganancia de FPS en gráficas modestas y portátiles; las sombras se ven toscas.',
     tierLabel: 'Nivel del hardware:', tier0: 'Bajo', tier1: 'Medio', tier2: 'Alto', tier3: 'Épico',
     reason_vram: '(según la VRAM)', reason_integrated: '(gráficos integrados)', reason_older: '(limitado por la generación de la gráfica)', reason_ramcpu: '(limitado por la RAM/CPU)',
     s2Title: 'Ajustes recomendados en el juego', s2Sub: 'Settings > GRAPHICS. Nombres como aparecen en el juego en inglés.',
@@ -644,6 +655,7 @@ const I18N = {
     detectDone: 'Détecté : {items}. Vérifiez la VRAM et la RAM.', detectNone: 'Votre navigateur n\'a pas révélé le matériel. Choisissez-le à la main.',
     profBalanced: 'Équilibré', profBalancedDesc: 'La meilleure qualité que votre matériel fait tourner de façon fluide.',
     profCompetitive: 'Compétitif', profCompetitiveDesc: 'FPS et visibilité maximum. Moins d\'effets, distance d\'affichage élevée.',
+    potatoLabel: 'Ombres patate', potatoDesc: 'Shadows et Shadow Map sur Low dans tous les profils. Le plus gros gain de FPS sur les petites cartes et les portables ; les ombres deviennent grossières.',
     tierLabel: 'Niveau du matériel :', tier0: 'Bas', tier1: 'Moyen', tier2: 'Élevé', tier3: 'Épique',
     reason_vram: '(selon la VRAM)', reason_integrated: '(graphiques intégrés)', reason_older: '(limité par la génération de la carte)', reason_ramcpu: '(limité par la RAM/CPU)',
     s2Title: 'Réglages recommandés dans le jeu', s2Sub: 'Settings > GRAPHICS. Noms tels qu\'affichés dans le jeu en anglais.',
@@ -708,6 +720,7 @@ const I18N = {
     detectDone: 'Erkannt: {items}. Bitte VRAM und RAM prüfen.', detectNone: 'Dein Browser hat die Hardware nicht verraten. Bitte selbst auswählen.',
     profBalanced: 'Ausgewogen', profBalancedDesc: 'Die beste Qualität, die deine Hardware flüssig schafft.',
     profCompetitive: 'Kompetitiv', profCompetitiveDesc: 'Maximale FPS und Sichtbarkeit. Weniger Effekte, hohe Sichtweite.',
+    potatoLabel: 'Kartoffel-Schatten', potatoDesc: 'Shadows und Shadow Map auf Low in jedem Profil. Der größte FPS-Gewinn auf schwachen Grafikkarten und Laptops; Schatten wirken grob.',
     tierLabel: 'Hardware-Stufe:', tier0: 'Niedrig', tier1: 'Mittel', tier2: 'Hoch', tier3: 'Episch',
     reason_vram: '(nach VRAM)', reason_integrated: '(integrierte Grafik)', reason_older: '(begrenzt durch GPU-Generation)', reason_ramcpu: '(begrenzt durch RAM/CPU)',
     s2Title: 'Empfohlene Einstellungen im Spiel', s2Sub: 'Settings > GRAPHICS. Namen wie im englischen Spielmenü.',
@@ -772,6 +785,7 @@ const I18N = {
     detectDone: 'Определено: {items}. Проверьте VRAM и RAM.', detectNone: 'Браузер не сообщил данные о железе. Выберите вручную.',
     profBalanced: 'Сбалансированный', profBalancedDesc: 'Лучшее качество, которое ваше железо тянет плавно.',
     profCompetitive: 'Соревновательный', profCompetitiveDesc: 'Максимум FPS и видимости. Меньше эффектов, высокая дальность прорисовки.',
+    potatoLabel: 'Картофельные тени', potatoDesc: 'Shadows и Shadow Map на Low в любом профиле. Самый большой прирост FPS на слабых видеокартах и ноутбуках; тени становятся грубыми.',
     tierLabel: 'Уровень железа:', tier0: 'Низкий', tier1: 'Средний', tier2: 'Высокий', tier3: 'Эпический',
     reason_vram: '(по объёму VRAM)', reason_integrated: '(встроенная графика)', reason_older: '(ограничено поколением видеокарты)', reason_ramcpu: '(ограничено RAM/CPU)',
     s2Title: 'Рекомендуемые настройки в игре', s2Sub: 'Settings > GRAPHICS. Названия как в английском меню игры.',
@@ -872,11 +886,12 @@ const I18N = {
     };
   }
   function mode() { return document.querySelector('input[name=profile]:checked').value; }
+  function potato() { return $('potato').checked; }
 
   // ----- render -----
   function render() {
     const h = hw();
-    const { items, tier } = Core.profile(h, mode());
+    const { items, tier } = Core.profile(h, mode(), potato());
     $('tierName').textContent = t('tier' + tier.tier);
     $('tierReason').textContent = t('reason_' + tier.reason);
 
@@ -920,7 +935,7 @@ const I18N = {
   // ----- INI -----
   function processIni() {
     const st = $('fileStatus');
-    const { items } = Core.profile(hw(), mode());
+    const { items } = Core.profile(hw(), mode(), potato());
     const res = Core.applyIni(loaded.dec.text, items);
     if (!res.ok) {
       st.className = 'status err'; st.textContent = t('fileErr');
@@ -1012,6 +1027,7 @@ const I18N = {
   $('vendor').addEventListener('change', () => { fillSeries(); render(); });
   ['series', 'vram', 'ram', 'threads', 'res', 'hz'].forEach(id => $(id).addEventListener('change', render));
   document.querySelectorAll('input[name=profile]').forEach(r => r.addEventListener('change', render));
+  $('potato').addEventListener('change', render);
   $('detect').addEventListener('click', detect);
   $('file').addEventListener('change', e => readFile(e.target.files[0]));
   const drop = $('drop');
